@@ -1,0 +1,29 @@
+﻿---
+// Dark mode toggle card - handles its own state via client-side JS
+---
+
+<div class="bento-item-content dark-mode-card" id="darkmode-toggle">
+  <div class="moon-icon" id="darkmode-icon">🌙</div>
+</div>
+
+<script>
+  const toggle = document.getElementById("darkmode-toggle");
+  const icon = document.getElementById("darkmode-icon");
+  
+  let isDark = localStorage.getItem("darkMode") === "true";
+  
+  function updateTheme() {
+    document.body.classList.toggle("dark-mode", isDark);
+    if (icon) icon.textContent = isDark ? "☀️" : "🌙";
+  }
+  
+  // Init
+  updateTheme();
+  
+  // Toggle on click
+  toggle?.addEventListener("click", () => {
+    isDark = !isDark;
+    localStorage.setItem("darkMode", String(isDark));
+    updateTheme();
+  });
+</script>

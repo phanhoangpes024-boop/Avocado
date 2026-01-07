@@ -1,0 +1,170 @@
+﻿---
+import type { GridItem } from "../types/grid";
+import BentoItem from "./BentoItem.astro";
+import CardIntro from "./CardIntro.astro";
+import CardBlog from "./CardBlog.astro";
+import CardSpotify from "./CardSpotify.astro";
+import CardTwitter from "./CardTwitter.astro";
+import CardMap from "./CardMap.astro";
+import CardProject from "./CardProject.astro";
+import CardDarkMode from "./CardDarkMode.astro";
+import CardNewsletter from "./CardNewsletter.astro";
+
+interface Props {
+  items: GridItem[];
+}
+
+const { items } = Astro.props;
+---
+
+<div class="bento-grid" id="bento-grid">
+  {items.map((item) => (
+    <BentoItem id={item.id} size={item.size}>
+      {item.type === "intro" && (
+        <CardIntro
+          emoji={item.emoji}
+          name={item.name}
+          title={item.title}
+          bio={item.bio}
+          buttonText={item.buttonText}
+        />
+      )}
+      
+      {item.type === "blog" && (
+        <CardBlog
+          title={item.title}
+          description={item.description}
+          date={item.date}
+          link={item.link}
+        />
+      )}
+      
+      {item.type === "spotify" && (
+        <CardSpotify
+          status={item.status}
+          song={item.song}
+          artist={item.artist}
+        />
+      )}
+      
+      {item.type === "twitter" && (
+        <CardTwitter link={item.link} />
+      )}
+      
+      {item.type === "map" && (
+        <CardMap
+          emoji={item.emoji}
+          location={item.location}
+        />
+      )}
+      
+      {item.type === "project" && (
+        <CardProject
+          emoji={item.emoji}
+          name={item.name}
+          theme={item.theme}
+          link={item.link}
+        />
+      )}
+      
+      {item.type === "darkmode" && (
+        <CardDarkMode />
+      )}
+      
+      {item.type === "newsletter" && (
+        <CardNewsletter
+          title={item.title}
+          placeholder={item.placeholder}
+          buttonText={item.buttonText}
+          subscriberCount={item.subscriberCount}
+        />
+      )}
+    </BentoItem>
+  ))}
+</div>
+
+<script>
+  import Muuri from "muuri";
+
+  let grid: Muuri | null = null;
+
+  function initMuuri() {
+    const gridElement = document.getElementById("bento-grid");
+    if (!gridElement) return;
+
+    grid = new Muuri(gridElement, {
+      dragEnabled: true,
+      dragStartPredicate: { distance: 0, delay: 0 },
+      dragSortPredicate: { threshold: 40, action: "swap" },
+      layout: {
+        fillGaps: true,
+        horizontal: false,
+        alignRight: false,
+        alignBottom: false,
+        rounding: true
+      },
+      layoutDuration: 400,
+      layoutEasing: "cubic-bezier(0.25, 0.1, 0.25, 1)",
+      dragRelease: {
+        duration: 300,
+        easing: "ease-out",
+        useDragContainer: true
+      },
+      dragPlaceholder: {
+        enabled: true,
+        createElement: (item) => {
+          const el = item.getElement();
+          if (!el) return document.createElement("div");
+          const placeholder = el.cloneNode(true) as HTMLElement;
+          placeholder.style.opacity = "0.3";
+          return placeholder;
+        }
+      },
+      dragContainer: document.body,
+      dragSortHeuristics: {
+        sortInterval: 50,
+        minDragDistance: 10,
+        minBounceBackAngle: 1
+      }
+    });
+
+    loadGridOrder();
+
+    grid.on("dragEnd", () => {
+      saveGridOrder();
+      grid?.layout(true);
+    });
+  }
+
+  function saveGridOrder() {
+    if (!grid) return;
+    const order = grid.getItems().map((item) => {
+      const el = item.getElement();
+      return el?.dataset.id || "";
+    });
+    localStorage.setItem("bentoGridOrder", JSON.stringify(order));
+  }
+
+  function loadGridOrder() {
+    const saved = localStorage.getItem("bentoGridOrder");
+    if (!saved || !grid) return;
+    try {
+      const order: string[] = JSON.parse(saved);
+      const items = grid.getItems();
+      const sortedItems = order
+        .map((id) => items.find((item) => item.getElement()?.dataset.id === id))
+        .filter((item): item is Muuri.Item => item !== undefined);
+      if (sortedItems.length === items.length) {
+        grid.sort(sortedItems, { layout: "instant" });
+      }
+    } catch (e) {
+      console.error("Failed to load grid order:", e);
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initMuuri);
+  } else {
+    initMuuri();
+  }
+</script>

@@ -1,0 +1,15 @@
+﻿---
+// Reset layout button - fixed position
+---
+
+<button class="reset-layout-btn" id="reset-btn">
+  <span>🔄</span>
+  <span>Reset Layout</span>
+</button>
+
+<script>
+  document.getElementById("reset-btn")?.addEventListener("click", () => {
+    localStorage.removeItem("bentoGridOrder");
+    location.reload();
+  });
+</script>

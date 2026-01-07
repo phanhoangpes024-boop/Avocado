@@ -1,0 +1,50 @@
+﻿---
+interface Props {
+  title: string;
+  placeholder: string;
+  buttonText: string;
+  subscriberCount: string;
+}
+
+const { title, placeholder, buttonText, subscriberCount } = Astro.props;
+---
+
+<div class="bento-item-content newsletter-card">
+  <div>
+    <h2 class="newsletter-title">{title}</h2>
+    <form class="newsletter-form" id="newsletter-form">
+      <input 
+        type="email" 
+        class="newsletter-input" 
+        id="email-input" 
+        placeholder={placeholder} 
+        required 
+      />
+      <button type="submit" class="newsletter-btn" id="subscribe-btn">
+        {buttonText}
+      </button>
+    </form>
+  </div>
+  <div class="subscriber-count">{subscriberCount}</div>
+</div>
+
+<script>
+  const form = document.getElementById("newsletter-form");
+  const btn = document.getElementById("subscribe-btn") as HTMLButtonElement;
+  const input = document.getElementById("email-input") as HTMLInputElement;
+  
+  form?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    if (!btn || !input) return;
+    
+    const originalText = btn.textContent;
+    btn.textContent = "✓ Subscribed!";
+    btn.style.background = "#10b981";
+    
+    setTimeout(() => {
+      btn.textContent = originalText;
+      btn.style.background = "#667eea";
+      input.value = "";
+    }, 2000);
+  });
+</script>

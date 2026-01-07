@@ -1,0 +1,28 @@
+﻿---
+import type { ItemSize } from "../types/grid";
+
+interface Props {
+  id: string;
+  size: ItemSize;
+  class?: string;
+}
+
+const { id, size, class: className = "" } = Astro.props;
+
+// Map size to CSS class
+const sizeClasses: Record<ItemSize, string> = {
+  large: "item-large",
+  wide: "item-wide",
+  small: "item-small",
+  tall: "item-tall"
+};
+
+const sizeClass = sizeClasses[size];
+---
+
+<div 
+  class:list={["bento-item", sizeClass, className]} 
+  data-id={id}
+>
+  <slot />
+</div>

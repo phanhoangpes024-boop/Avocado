@@ -1,0 +1,21 @@
+﻿---
+interface Props {
+  emoji: string;
+  name: string;
+  title: string;
+  bio: string;
+  buttonText: string;
+}
+
+const { emoji, name, title, bio, buttonText } = Astro.props;
+---
+
+<div class="bento-item-content intro-card">
+  <div>
+    <div class="memoji">{emoji}</div>
+    <h1 class="intro-name">{name}</h1>
+    <p class="intro-title">{title}</p>
+    <p class="intro-bio">{bio}</p>
+  </div>
+  <button class="lockdown-btn">{buttonText}</button>
+</div>

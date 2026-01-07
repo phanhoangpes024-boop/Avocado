@@ -1,0 +1,56 @@
+﻿---
+import type { ProjectTheme } from "../types/grid";
+
+interface Props {
+  emoji: string;
+  name: string;
+  theme: ProjectTheme;
+  link?: string;
+}
+
+const { emoji, name, theme, link } = Astro.props;
+
+// Map theme to CSS class
+const themeClasses: Record<ProjectTheme, string> = {
+  pink: "project-pink",
+  yellow: "project-yellow",
+  mint: "project-mint"
+};
+
+const themeClass = themeClasses[theme];
+---
+
+<div class:list={["bento-item-content", "project-card", themeClass]}>
+  <div class="project-mockup">{emoji}</div>
+  <div class="project-info">
+    <div class="project-name">{name}</div>
+    {link && (
+      <a href={link} class="project-link" aria-label={`View ${name}`}>→</a>
+    )}
+  </div>
+</div>
+
+<style>
+  .project-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .project-link {
+    width: 32px;
+    height: 32px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: #1a1a1a;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+  }
+  .project-link:hover {
+    transform: scale(1.1);
+  }
+</style>

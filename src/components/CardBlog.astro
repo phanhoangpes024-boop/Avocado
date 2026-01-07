@@ -1,0 +1,30 @@
+﻿---
+interface Props {
+  title: string;
+  description: string;
+  date: string;
+  link?: string;
+}
+
+const { title, description, date, link = "#" } = Astro.props;
+---
+
+<div class="bento-item-content blog-card">
+  <div>
+    <h2 class="blog-title">{title}</h2>
+    <p class="blog-description">{description}</p>
+  </div>
+  <div class="blog-footer">
+    <span class="blog-date">{date}</span>
+    <a href={link} class="read-more" aria-label="Read more">→</a>
+  </div>
+</div>
+
+<style>
+  .read-more {
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+</style>
