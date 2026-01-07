@@ -1,0 +1,271 @@
+﻿---
+import Layout from "../layouts/Layout.astro";
+---
+<Layout title="Portfolio - Bento Grid">
+  <div class="portfolio-wrapper">
+    <div class="portfolio-container">
+      <header class="header">
+        <div class="logo">nev</div>
+        <nav class="nav">
+          <a href="#work">Work</a>
+          <a href="#about">About</a>
+          <a href="#contact">Contact</a>
+        </nav>
+      </header>
+
+      <div class="bento-grid" id="bento-grid">
+        <!-- Intro Card -->
+        <div class="bento-item item-large" data-id="intro">
+          <div class="bento-item-content intro-card">
+            <div>
+              <div class="memoji">👨‍💻</div>
+              <h1 class="intro-name">Alex Rivera</h1>
+              <p class="intro-title">Developer & Designer</p>
+              <p class="intro-bio">Passionate about React, Design, Startups, and Music. Building beautiful experiences that make a difference.</p>
+            </div>
+            <button class="lockdown-btn">Toggle Lockdown</button>
+          </div>
+        </div>
+
+        <!-- Blog Card -->
+        <div class="bento-item item-wide" data-id="blog">
+          <div class="bento-item-content blog-card">
+            <div>
+              <h2 class="blog-title">Building Better Products</h2>
+              <p class="blog-description">A deep dive into product thinking and user experience design principles that matter.</p>
+            </div>
+            <div class="blog-footer">
+              <span class="blog-date">Mar 15, 2024</span>
+              <button class="read-more" aria-label="Read more">→</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Spotify Card -->
+        <div class="bento-item item-small" data-id="spotify">
+          <div class="bento-item-content spotify-card">
+            <svg class="spotify-icon" viewBox="0 0 24 24" fill="white">
+              <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
+            </svg>
+            <div>
+              <div class="spotify-status">Offline. Last played</div>
+              <div class="spotify-song">Midnight City</div>
+              <div class="spotify-artist">M83</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Twitter Card -->
+        <div class="bento-item item-small" data-id="twitter">
+          <div class="bento-item-content twitter-card">
+            <svg class="twitter-icon" viewBox="0 0 24 24">
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Map Card -->
+        <div class="bento-item item-small" data-id="map">
+          <div class="bento-item-content map-card">
+            <svg class="map-lines" viewBox="0 0 200 200">
+              <line x1="0" y1="50" x2="200" y2="50" stroke="#9ca3af" stroke-width="1"/>
+              <line x1="0" y1="100" x2="200" y2="100" stroke="#9ca3af" stroke-width="1"/>
+              <line x1="0" y1="150" x2="200" y2="150" stroke="#9ca3af" stroke-width="1"/>
+              <line x1="50" y1="0" x2="50" y2="200" stroke="#9ca3af" stroke-width="1"/>
+              <line x1="100" y1="0" x2="100" y2="200" stroke="#9ca3af" stroke-width="1"/>
+              <line x1="150" y1="0" x2="150" y2="200" stroke="#9ca3af" stroke-width="1"/>
+            </svg>
+            <div class="map-marker">📍</div>
+          </div>
+        </div>
+
+        <!-- Project Card 1 -->
+        <div class="bento-item item-small" data-id="project1">
+          <div class="bento-item-content project-card project-pink">
+            <div class="project-mockup">🎨</div>
+            <div class="project-name">Design System</div>
+          </div>
+        </div>
+
+        <!-- Project Card 2 -->
+        <div class="bento-item item-small" data-id="project2">
+          <div class="bento-item-content project-card project-yellow">
+            <div class="project-mockup">📱</div>
+            <div class="project-name">Mobile App</div>
+          </div>
+        </div>
+
+        <!-- Dark Mode Toggle -->
+        <div class="bento-item item-small" data-id="darkmode">
+          <div class="bento-item-content dark-mode-card">
+            <div class="moon-icon">🌙</div>
+          </div>
+        </div>
+
+        <!-- Project Card 3 -->
+        <div class="bento-item item-small" data-id="project3">
+          <div class="bento-item-content project-card project-mint">
+            <div class="project-mockup">🚀</div>
+            <div class="project-name">SaaS Platform</div>
+          </div>
+        </div>
+
+        <!-- Newsletter Card -->
+        <div class="bento-item item-wide" data-id="newsletter">
+          <div class="bento-item-content newsletter-card">
+            <div>
+              <h2 class="newsletter-title">Stay Updated</h2>
+              <form class="newsletter-form" id="newsletter-form">
+                <input type="email" class="newsletter-input" id="email-input" placeholder="your@email.com" required />
+                <button type="submit" class="newsletter-btn" id="subscribe-btn">Subscribe</button>
+              </form>
+            </div>
+            <div class="subscriber-count">1,234 subscribers</div>
+          </div>
+        </div>
+      </div>
+
+      <button class="reset-layout-btn" id="reset-btn">
+        <span>🔄</span>
+        <span>Reset Layout</span>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    import Muuri from "muuri";
+
+    let grid: Muuri | null = null;
+
+    function initMuuri() {
+      const gridElement = document.getElementById("bento-grid");
+      if (!gridElement) return;
+
+      grid = new Muuri(gridElement, {
+        // Bật kéo thả
+        dragEnabled: true,
+
+        // Khối kéo dính sát chuột - KHÔNG delay
+        dragStartPredicate: {
+          distance: 0,
+          delay: 0
+        },
+
+        // Swap vị trí khi kéo
+        dragSortPredicate: {
+          threshold: 40,
+          action: "swap"
+        },
+
+        // Layout masonry - lấp đầy lên trên
+        layout: {
+          fillGaps: true,
+          horizontal: false,
+          alignRight: false,
+          alignBottom: false,
+          rounding: true
+        },
+
+        // Animation cho các khối KHÁC (không phải khối đang kéo)
+        layoutDuration: 400,
+        layoutEasing: "cubic-bezier(0.25, 0.1, 0.25, 1)",
+
+        // Animation khi thả khối
+        dragRelease: {
+          duration: 300,
+          easing: "ease-out",
+          useDragContainer: true
+        },
+
+        // Placeholder
+        dragPlaceholder: {
+          enabled: true,
+          createElement: function (item) {
+            const el = item.getElement();
+            if (!el) return document.createElement("div");
+            const placeholder = el.cloneNode(true) as HTMLElement;
+            placeholder.style.opacity = "0.3";
+            return placeholder;
+          }
+        },
+
+        // Container khi kéo
+        dragContainer: document.body,
+
+        // Sắp xếp lại nhanh hơn
+        dragSortHeuristics: {
+          sortInterval: 50,
+          minDragDistance: 10,
+          minBounceBackAngle: 1
+        }
+      });
+
+      // Load vị trí đã lưu
+      loadGridOrder();
+
+      // Lưu khi kéo xong
+      grid.on("dragEnd", function () {
+        saveGridOrder();
+        // Refresh layout để lấp đầy khoảng trống
+        if (grid) grid.layout(true);
+      });
+    }
+
+    function saveGridOrder() {
+      if (!grid) return;
+      const order = grid.getItems().map((item) => {
+        const el = item.getElement();
+        return el ? el.dataset.id : "";
+      });
+      localStorage.setItem("bentoGridOrder", JSON.stringify(order));
+    }
+
+    function loadGridOrder() {
+      const saved = localStorage.getItem("bentoGridOrder");
+      if (!saved || !grid) return;
+
+      try {
+        const order: string[] = JSON.parse(saved);
+        const items = grid.getItems();
+        const sortedItems = order
+          .map((id) => items.find((item) => item.getElement()?.dataset.id === id))
+          .filter((item): item is Muuri.Item => item !== undefined);
+
+        if (sortedItems.length === items.length) {
+          grid.sort(sortedItems, { layout: "instant" });
+        }
+      } catch (e) {
+        console.error("Failed to load grid order:", e);
+      }
+    }
+
+    // Reset button
+    document.getElementById("reset-btn")?.addEventListener("click", () => {
+      localStorage.removeItem("bentoGridOrder");
+      location.reload();
+    });
+
+    // Newsletter form
+    document.getElementById("newsletter-form")?.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const btn = document.getElementById("subscribe-btn") as HTMLButtonElement;
+      const input = document.getElementById("email-input") as HTMLInputElement;
+      if (btn) {
+        btn.textContent = "✓ Subscribed!";
+        btn.style.background = "#10b981";
+        setTimeout(() => {
+          btn.textContent = "Subscribe";
+          btn.style.background = "#667eea";
+          if (input) input.value = "";
+        }, 2000);
+      }
+    });
+
+    // Initialize khi DOM ready
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initMuuri);
+    } else {
+      initMuuri();
+    }
+  </script>
+</Layout>
