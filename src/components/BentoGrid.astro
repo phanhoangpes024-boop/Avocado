@@ -21,63 +21,22 @@ const { items } = Astro.props;
   {items.map((item) => (
     <BentoItem id={item.id} size={item.size}>
       {item.type === "intro" && (
-        <CardIntro
-          emoji={item.emoji}
-          name={item.name}
-          title={item.title}
-          bio={item.bio}
-          buttonText={item.buttonText}
-        />
+        <CardIntro emoji={item.emoji} name={item.name} title={item.title} bio={item.bio} buttonText={item.buttonText} />
       )}
-      
       {item.type === "blog" && (
-        <CardBlog
-          title={item.title}
-          description={item.description}
-          date={item.date}
-          link={item.link}
-        />
+        <CardBlog title={item.title} description={item.description} date={item.date} link={item.link} />
       )}
-      
       {item.type === "spotify" && (
-        <CardSpotify
-          status={item.status}
-          song={item.song}
-          artist={item.artist}
-        />
+        <CardSpotify status={item.status} song={item.song} artist={item.artist} />
       )}
-      
-      {item.type === "twitter" && (
-        <CardTwitter link={item.link} />
-      )}
-      
-      {item.type === "map" && (
-        <CardMap
-          emoji={item.emoji}
-          location={item.location}
-        />
-      )}
-      
+      {item.type === "twitter" && <CardTwitter link={item.link} />}
+      {item.type === "map" && <CardMap emoji={item.emoji} location={item.location} />}
       {item.type === "project" && (
-        <CardProject
-          emoji={item.emoji}
-          name={item.name}
-          theme={item.theme}
-          link={item.link}
-        />
+        <CardProject emoji={item.emoji} name={item.name} theme={item.theme} link={item.link} />
       )}
-      
-      {item.type === "darkmode" && (
-        <CardDarkMode />
-      )}
-      
+      {item.type === "darkmode" && <CardDarkMode />}
       {item.type === "newsletter" && (
-        <CardNewsletter
-          title={item.title}
-          placeholder={item.placeholder}
-          buttonText={item.buttonText}
-          subscriberCount={item.subscriberCount}
-        />
+        <CardNewsletter title={item.title} placeholder={item.placeholder} buttonText={item.buttonText} subscriberCount={item.subscriberCount} />
       )}
     </BentoItem>
   ))}
@@ -89,82 +48,51 @@ const { items } = Astro.props;
   let grid: Muuri | null = null;
 
   function initMuuri() {
-    const gridElement = document.getElementById("bento-grid");
-    if (!gridElement) return;
+    const el = document.getElementById("bento-grid");
+    if (!el) return;
 
-    grid = new Muuri(gridElement, {
+    grid = new Muuri(el, {
       dragEnabled: true,
       dragStartPredicate: { distance: 0, delay: 0 },
       dragSortPredicate: { threshold: 40, action: "swap" },
-      layout: {
-        fillGaps: true,
-        horizontal: false,
-        alignRight: false,
-        alignBottom: false,
-        rounding: true
-      },
+      layout: { fillGaps: true, horizontal: false, alignRight: false, alignBottom: false, rounding: true },
       layoutDuration: 400,
       layoutEasing: "cubic-bezier(0.25, 0.1, 0.25, 1)",
-      dragRelease: {
-        duration: 300,
-        easing: "ease-out",
-        useDragContainer: true
-      },
+      dragRelease: { duration: 300, easing: "ease-out", useDragContainer: true },
       dragPlaceholder: {
         enabled: true,
         createElement: (item) => {
           const el = item.getElement();
           if (!el) return document.createElement("div");
-          const placeholder = el.cloneNode(true) as HTMLElement;
-          placeholder.style.opacity = "0.3";
-          return placeholder;
+          const p = el.cloneNode(true) as HTMLElement;
+          p.style.opacity = "0.3";
+          return p;
         }
       },
       dragContainer: document.body,
-      dragSortHeuristics: {
-        sortInterval: 50,
-        minDragDistance: 10,
-        minBounceBackAngle: 1
-      }
+      dragSortHeuristics: { sortInterval: 50, minDragDistance: 10, minBounceBackAngle: 1 }
     });
 
-    loadGridOrder();
-
-    grid.on("dragEnd", () => {
-      saveGridOrder();
-      grid?.layout(true);
-    });
+    loadOrder();
+    grid.on("dragEnd", () => { saveOrder(); grid?.layout(true); });
   }
 
-  function saveGridOrder() {
+  function saveOrder() {
     if (!grid) return;
-    const order = grid.getItems().map((item) => {
-      const el = item.getElement();
-      return el?.dataset.id || "";
-    });
+    const order = grid.getItems().map((i) => i.getElement()?.dataset.id || "");
     localStorage.setItem("bentoGridOrder", JSON.stringify(order));
   }
 
-  function loadGridOrder() {
+  function loadOrder() {
     const saved = localStorage.getItem("bentoGridOrder");
     if (!saved || !grid) return;
     try {
       const order: string[] = JSON.parse(saved);
       const items = grid.getItems();
-      const sortedItems = order
-        .map((id) => items.find((item) => item.getElement()?.dataset.id === id))
-        .filter((item): item is Muuri.Item => item !== undefined);
-      if (sortedItems.length === items.length) {
-        grid.sort(sortedItems, { layout: "instant" });
-      }
-    } catch (e) {
-      console.error("Failed to load grid order:", e);
-    }
+      const sorted = order.map((id) => items.find((i) => i.getElement()?.dataset.id === id)).filter((i): i is Muuri.Item => !!i);
+      if (sorted.length === items.length) grid.sort(sorted, { layout: "instant" });
+    } catch (e) { console.error(e); }
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initMuuri);
-  } else {
-    initMuuri();
-  }
+  document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", initMuuri) : initMuuri();
 </script>

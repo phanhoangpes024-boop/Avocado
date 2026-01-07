@@ -1,27 +1,17 @@
 ﻿---
-// ===== IMPORTS =====
 import Layout from "../layouts/Layout.astro";
 import Header from "../components/Header.astro";
 import BentoGrid from "../components/BentoGrid.astro";
 import ResetButton from "../components/ResetButton.astro";
-
-// ===== DATA =====
 import { gridItems, siteConfig } from "../data/gridConfig";
 ---
 
 <Layout title="Portfolio - Bento Grid">
   <div class="portfolio-wrapper">
     <div class="portfolio-container">
-      
-      <!-- Header -->
       <Header logo={siteConfig.logo} nav={siteConfig.nav} />
-      
-      <!-- Bento Grid - Renders from data -->
       <BentoGrid items={gridItems} />
-      
-      <!-- Reset Button -->
       <ResetButton />
-      
     </div>
   </div>
 </Layout>

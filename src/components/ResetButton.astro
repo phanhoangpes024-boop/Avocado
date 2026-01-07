@@ -1,11 +1,42 @@
 ﻿---
-// Reset layout button - fixed position
+
 ---
 
-<button class="reset-layout-btn" id="reset-btn">
+<button class="reset-btn" id="reset-btn">
   <span>🔄</span>
   <span>Reset Layout</span>
 </button>
+
+<style>
+  .reset-btn {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: #1a1a1a;
+    color: white;
+    border: none;
+    padding: 14px 24px;
+    border-radius: 50px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    transition: all 0.2s;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .reset-btn:hover {
+    background: #2d3748;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.2);
+  }
+
+  .reset-btn:active {
+    transform: translateY(0);
+  }
+</style>
 
 <script>
   document.getElementById("reset-btn")?.addEventListener("click", () => {

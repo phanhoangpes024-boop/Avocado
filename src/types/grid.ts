@@ -1,27 +1,13 @@
-﻿// ===== GRID ITEM TYPES =====
-
-export type ItemSize = "large" | "wide" | "small" | "tall";
-
-export type CardType = 
-  | "intro" 
-  | "blog" 
-  | "spotify" 
-  | "twitter" 
-  | "map" 
-  | "project" 
-  | "darkmode" 
-  | "newsletter";
-
+﻿export type ItemSize = "large" | "wide" | "small" | "tall";
+export type CardType = "intro" | "blog" | "spotify" | "twitter" | "map" | "project" | "darkmode" | "newsletter";
 export type ProjectTheme = "pink" | "yellow" | "mint";
 
-// Base interface
 export interface BaseGridItem {
   id: string;
   size: ItemSize;
   type: CardType;
 }
 
-// Intro Card
 export interface IntroCardData extends BaseGridItem {
   type: "intro";
   emoji: string;
@@ -31,7 +17,6 @@ export interface IntroCardData extends BaseGridItem {
   buttonText: string;
 }
 
-// Blog Card
 export interface BlogCardData extends BaseGridItem {
   type: "blog";
   title: string;
@@ -40,7 +25,6 @@ export interface BlogCardData extends BaseGridItem {
   link?: string;
 }
 
-// Spotify Card
 export interface SpotifyCardData extends BaseGridItem {
   type: "spotify";
   status: string;
@@ -48,20 +32,17 @@ export interface SpotifyCardData extends BaseGridItem {
   artist: string;
 }
 
-// Twitter Card
 export interface TwitterCardData extends BaseGridItem {
   type: "twitter";
   link?: string;
 }
 
-// Map Card
 export interface MapCardData extends BaseGridItem {
   type: "map";
   emoji: string;
   location?: string;
 }
 
-// Project Card
 export interface ProjectCardData extends BaseGridItem {
   type: "project";
   emoji: string;
@@ -70,12 +51,10 @@ export interface ProjectCardData extends BaseGridItem {
   link?: string;
 }
 
-// Dark Mode Card
 export interface DarkModeCardData extends BaseGridItem {
   type: "darkmode";
 }
 
-// Newsletter Card
 export interface NewsletterCardData extends BaseGridItem {
   type: "newsletter";
   title: string;
@@ -84,7 +63,6 @@ export interface NewsletterCardData extends BaseGridItem {
   subscriberCount: string;
 }
 
-// Union type for all cards
 export type GridItem =
   | IntroCardData
   | BlogCardData
