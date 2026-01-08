@@ -1,11 +1,13 @@
-﻿export type ItemSize = "large" | "wide" | "small" | "tall";
-export type CardType = "intro" | "blog" | "spotify" | "twitter" | "map" | "project" | "darkmode" | "newsletter";
+﻿export type CardType = "intro" | "blog" | "spotify" | "twitter" | "map" | "project" | "darkmode" | "newsletter";
 export type ProjectTheme = "pink" | "yellow" | "mint";
 
 export interface BaseGridItem {
   id: string;
-  size: ItemSize;
   type: CardType;
+  col: number;       // Cột bắt đầu (1-4)
+  row: number;       // Hàng bắt đầu
+  colSpan: number;   // Số cột chiếm (1, 2, 3...)
+  rowSpan: number;   // Số hàng chiếm (1, 2, 3...)
 }
 
 export interface IntroCardData extends BaseGridItem {

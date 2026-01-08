@@ -12,64 +12,27 @@ html, body {
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
-  background: #F8F9FA;
-  color: #1a1a1a;
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  color: #f8fafc;
   overflow-x: hidden;
+  min-height: 100vh;
 }
 
 /* ===== LAYOUT ===== */
 .portfolio-wrapper {
   width: 100%;
-  height: 100%;
+  min-height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
-}
-
-.portfolio-container {
-  max-width: 1400px;
-  margin: 0 auto;
   padding: 24px;
 }
 
-/* ===== MUURI GRID ===== */
-.bento-grid {
-  position: relative;
-}
-
-.bento-item {
-  position: absolute;
-  z-index: 1;
-  margin: 10px;
-}
-
-/* Muuri drag states */
-.muuri-item-dragging {
-  z-index: 9999;
-}
-
-.muuri-item-dragging .bento-item-content {
-  transform: scale(1.05);
-  box-shadow: 0 25px 50px rgba(0,0,0,0.2);
-  transition: none !important;
-}
-
-.bento-item:not(.muuri-item-dragging):not(.muuri-item-releasing) {
-  transition: transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
-}
-
-.muuri-item-releasing {
-  z-index: 9998;
-}
-
-.muuri-item-placeholder {
-  opacity: 0.3;
-  border: 2px dashed #667eea;
-  border-radius: 24px;
-  background: #e5e7eb;
+.portfolio-container {
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 /* ===== DARK MODE ===== */
 body.dark-mode {
-  background: #1a1a1a;
-  color: #f8f9fa;
+  background: linear-gradient(135deg, #0f172a 0%, #020617 100%);
 }

@@ -26,14 +26,14 @@ const { logo, nav } = Astro.props;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 32px;
+    margin-bottom: 24px;
     padding: 0 8px;
   }
 
   .logo {
     font-size: 28px;
     font-weight: 700;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -45,17 +45,13 @@ const { logo, nav } = Astro.props;
   }
 
   .nav a {
-    color: #4a5568;
+    color: #94a3b8;
     text-decoration: none;
     font-weight: 500;
     transition: color 0.2s;
   }
 
   .nav a:hover {
-    color: #667eea;
-  }
-
-  @media (max-width: 768px) {
-    .nav { gap: 20px; }
+    color: #f8fafc;
   }
 </style>

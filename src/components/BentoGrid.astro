@@ -1,6 +1,6 @@
 ﻿---
 import type { GridItem } from "../types/grid";
-import BentoItem from "./BentoItem.astro";
+import { gridConfig } from "../data/gridConfig";
 import CardIntro from "./CardIntro.astro";
 import CardBlog from "./CardBlog.astro";
 import CardSpotify from "./CardSpotify.astro";
@@ -15,84 +15,327 @@ interface Props {
 }
 
 const { items } = Astro.props;
+const { cols, cellSize, gap } = gridConfig;
 ---
 
-<div class="bento-grid" id="bento-grid">
+<div class="bento-grid" id="bento-grid" data-cols={cols} data-cell={cellSize} data-gap={gap}>
+  <div class="drag-placeholder" id="drag-placeholder"></div>
   {items.map((item) => (
-    <BentoItem id={item.id} size={item.size}>
-      {item.type === "intro" && (
-        <CardIntro emoji={item.emoji} name={item.name} title={item.title} bio={item.bio} buttonText={item.buttonText} />
-      )}
-      {item.type === "blog" && (
-        <CardBlog title={item.title} description={item.description} date={item.date} link={item.link} />
-      )}
-      {item.type === "spotify" && (
-        <CardSpotify status={item.status} song={item.song} artist={item.artist} />
-      )}
+    <div class="bento-item" data-id={item.id} data-col={item.col} data-row={item.row} data-colspan={item.colSpan} data-rowspan={item.rowSpan}>
+      {item.type === "intro" && <CardIntro emoji={item.emoji} name={item.name} title={item.title} bio={item.bio} buttonText={item.buttonText} />}
+      {item.type === "blog" && <CardBlog title={item.title} description={item.description} date={item.date} link={item.link} />}
+      {item.type === "spotify" && <CardSpotify status={item.status} song={item.song} artist={item.artist} />}
       {item.type === "twitter" && <CardTwitter link={item.link} />}
       {item.type === "map" && <CardMap emoji={item.emoji} location={item.location} />}
-      {item.type === "project" && (
-        <CardProject emoji={item.emoji} name={item.name} theme={item.theme} link={item.link} />
-      )}
+      {item.type === "project" && <CardProject emoji={item.emoji} name={item.name} theme={item.theme} link={item.link} />}
       {item.type === "darkmode" && <CardDarkMode />}
-      {item.type === "newsletter" && (
-        <CardNewsletter title={item.title} placeholder={item.placeholder} buttonText={item.buttonText} subscriberCount={item.subscriberCount} />
-      )}
-    </BentoItem>
+      {item.type === "newsletter" && <CardNewsletter title={item.title} placeholder={item.placeholder} buttonText={item.buttonText} subscriberCount={item.subscriberCount} />}
+    </div>
   ))}
 </div>
 
+<style>
+  .bento-grid { position: relative; margin: 0 auto; background: rgba(0,0,0,0.02); border-radius: 24px; padding: 16px; }
+  .bento-item { position: absolute; cursor: grab; user-select: none; }
+  .bento-item:active { cursor: grabbing; }
+  .bento-item:not(.dragging) { transition: transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94), width 0.25s, height 0.25s; }
+  .bento-item.dragging { z-index: 100; transition: none; }
+  .bento-item.dragging > :global(*:first-child) { transform: scale(1.02) rotate(1deg); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5) !important; }
+  .drag-placeholder { position: absolute; border: 2px dashed rgba(102, 126, 234, 0.5); border-radius: 20px; background: rgba(102, 126, 234, 0.1); transition: all 0.15s ease-out; pointer-events: none; opacity: 0; z-index: 0; }
+  .drag-placeholder.visible { opacity: 1; }
+</style>
+
 <script>
-  import Muuri from "muuri";
+  interface Card { 
+    id: string; 
+    col: number; 
+    row: number; 
+    colSpan: number; 
+    rowSpan: number; 
+    // Lưu kích thước gốc để restore khi về desktop
+    baseColSpan: number;
+    baseRowSpan: number;
+    el: HTMLElement; 
+  }
+  
+  interface DragState { 
+    cardId: string; 
+    card: Card; 
+    offsetX: number; 
+    offsetY: number; 
+    mouseX: number; 
+    mouseY: number; 
+    targetCol: number; 
+    targetRow: number; 
+    originalCards: Card[]; 
+  }
 
-  let grid: Muuri | null = null;
+  // Config gốc
+  let BASE_COLS = 4, BASE_CELL = 180, BASE_GAP = 12;
+  // Config hiện tại (có thể thay đổi theo responsive)
+  let COLS = 4, CELL = 180, GAP = 12;
+  const MAX_ROWS = 50;
+  
+  let cards: Card[] = [];
+  let dragState: DragState | null = null;
+  let previewCards: Card[] | null = null;
+  let gridEl: HTMLElement, placeholderEl: HTMLElement;
+  let rafId: number | null = null;
 
-  function initMuuri() {
-    const el = document.getElementById("bento-grid");
-    if (!el) return;
+  function toPixel(col: number, row: number, colSpan = 1, rowSpan = 1) {
+    return { x: (col - 1) * (CELL + GAP), y: (row - 1) * (CELL + GAP), w: colSpan * CELL + (colSpan - 1) * GAP, h: rowSpan * CELL + (rowSpan - 1) * GAP };
+  }
 
-    grid = new Muuri(el, {
-      dragEnabled: true,
-      dragStartPredicate: { distance: 0, delay: 0 },
-      dragSortPredicate: { threshold: 40, action: "swap" },
-      layout: { fillGaps: true, horizontal: false, alignRight: false, alignBottom: false, rounding: true },
-      layoutDuration: 400,
-      layoutEasing: "cubic-bezier(0.25, 0.1, 0.25, 1)",
-      dragRelease: { duration: 300, easing: "ease-out", useDragContainer: true },
-      dragPlaceholder: {
-        enabled: true,
-        createElement: (item) => {
-          const el = item.getElement();
-          if (!el) return document.createElement("div");
-          const p = el.cloneNode(true) as HTMLElement;
-          p.style.opacity = "0.3";
-          return p;
+  function toGrid(x: number, y: number) {
+    return { col: Math.max(1, Math.min(COLS, Math.round(x / (CELL + GAP)) + 1)), row: Math.max(1, Math.round(y / (CELL + GAP)) + 1) };
+  }
+
+  function cardsOverlap(a: Card, b: Card): boolean {
+    const aR = a.col + a.colSpan - 1, aB = a.row + a.rowSpan - 1;
+    const bR = b.col + b.colSpan - 1, bB = b.row + b.rowSpan - 1;
+    if (aR < b.col || a.col > bR) return false;
+    if (aB < b.row || a.row > bB) return false;
+    return true;
+  }
+
+  // ===== COMPACT - Giữ nguyên cột, chỉ đẩy xuống/hút lên =====
+  function compactAll(cardList: Card[], draggedId: string | null): Card[] {
+    const result = cardList.map(c => ({ ...c }));
+    const draggedCard = draggedId ? result.find(c => c.id === draggedId) : null;
+    const otherCards = result.filter(c => c.id !== draggedId).sort((a, b) => a.row - b.row || a.col - b.col);
+    const placedCards: Card[] = [];
+    
+    if (draggedCard) placedCards.push(draggedCard);
+    
+    for (const card of otherCards) {
+      let newRow = 1;
+      while (newRow <= MAX_ROWS) {
+        const testCard = { ...card, row: newRow };
+        let hasCollision = false;
+        for (const placed of placedCards) {
+          if (cardsOverlap(testCard, placed)) { hasCollision = true; break; }
         }
-      },
-      dragContainer: document.body,
-      dragSortHeuristics: { sortInterval: 50, minDragDistance: 10, minBounceBackAngle: 1 }
+        if (!hasCollision) break;
+        newRow++;
+      }
+      card.row = newRow;
+      placedCards.push(card);
+    }
+    return result;
+  }
+
+  function calculateLayout(baseCards: Card[], draggedId: string, targetCol: number, targetRow: number): Card[] {
+    const draggedCard = baseCards.find(c => c.id === draggedId);
+    if (!draggedCard) return baseCards;
+    const maxCol = COLS - draggedCard.colSpan + 1;
+    targetCol = Math.max(1, Math.min(maxCol, targetCol));
+    targetRow = Math.max(1, targetRow);
+    const result = baseCards.map(c => c.id === draggedId ? { ...c, col: targetCol, row: targetRow } : { ...c });
+    return compactAll(result, draggedId);
+  }
+
+  function render() {
+    const displayCards = previewCards || cards;
+    for (const card of cards) {
+      const dc = displayCards.find(c => c.id === card.id);
+      if (!dc) continue;
+      const pos = toPixel(dc.col, dc.row, dc.colSpan, dc.rowSpan);
+      const isDragging = dragState?.cardId === card.id;
+      if (isDragging && dragState) {
+        card.el.style.transform = `translate3d(${dragState.mouseX - dragState.offsetX}px, ${dragState.mouseY - dragState.offsetY}px, 0)`;
+      } else {
+        card.el.style.transform = `translate3d(${pos.x}px, ${pos.y}px, 0)`;
+      }
+      card.el.style.width = `${pos.w}px`;
+      card.el.style.height = `${pos.h}px`;
+    }
+    const maxRow = Math.max(...displayCards.map(c => c.row + c.rowSpan - 1), 1);
+    gridEl.style.height = `${maxRow * CELL + (maxRow - 1) * GAP + 32}px`;
+    gridEl.style.width = `${COLS * CELL + (COLS - 1) * GAP + 32}px`;
+  }
+
+  function showPlaceholder(col: number, row: number, colSpan: number, rowSpan: number) {
+    const pos = toPixel(col, row, colSpan, rowSpan);
+    placeholderEl.style.transform = `translate3d(${pos.x}px, ${pos.y}px, 0)`;
+    placeholderEl.style.width = `${pos.w}px`;
+    placeholderEl.style.height = `${pos.h}px`;
+    placeholderEl.classList.add("visible");
+  }
+
+  function hidePlaceholder() { placeholderEl.classList.remove("visible"); }
+
+  function handleMouseDown(e: MouseEvent, card: Card) {
+    e.preventDefault();
+    const rect = gridEl.getBoundingClientRect();
+    const pos = toPixel(card.col, card.row);
+    dragState = { cardId: card.id, card: { ...card }, offsetX: e.clientX - rect.left - pos.x, offsetY: e.clientY - rect.top - pos.y, mouseX: e.clientX - rect.left, mouseY: e.clientY - rect.top, targetCol: card.col, targetRow: card.row, originalCards: cards.map(c => ({ ...c })) };
+    previewCards = null;
+    card.el.classList.add("dragging");
+    showPlaceholder(card.col, card.row, card.colSpan, card.rowSpan);
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
+  }
+
+  function handleMouseMove(e: MouseEvent) {
+    if (!dragState) return;
+    const rect = gridEl.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left, mouseY = e.clientY - rect.top;
+    if (rafId) cancelAnimationFrame(rafId);
+    rafId = requestAnimationFrame(() => {
+      if (!dragState) return;
+      const gridPos = toGrid(mouseX - dragState.offsetX, mouseY - dragState.offsetY);
+      const maxCol = COLS - dragState.card.colSpan + 1;
+      const targetCol = Math.max(1, Math.min(maxCol, gridPos.col));
+      const targetRow = Math.max(1, gridPos.row);
+      previewCards = calculateLayout(dragState.originalCards, dragState.cardId, targetCol, targetRow);
+      dragState.mouseX = mouseX; dragState.mouseY = mouseY; dragState.targetCol = targetCol; dragState.targetRow = targetRow;
+      render();
+      showPlaceholder(targetCol, targetRow, dragState.card.colSpan, dragState.card.rowSpan);
     });
-
-    loadOrder();
-    grid.on("dragEnd", () => { saveOrder(); grid?.layout(true); });
   }
 
-  function saveOrder() {
-    if (!grid) return;
-    const order = grid.getItems().map((i) => i.getElement()?.dataset.id || "");
-    localStorage.setItem("bentoGridOrder", JSON.stringify(order));
+  function handleMouseUp() {
+    if (!dragState) return;
+    
+    // Tính layout cuối
+    let finalLayout = calculateLayout(dragState.originalCards, dragState.cardId, dragState.targetCol, dragState.targetRow);
+    
+    // QUAN TRỌNG: Compact TẤT CẢ cards (không exclude ai) để hút lên
+    finalLayout = compactAll(finalLayout, null);
+    
+    // Update cards
+    for (const fc of finalLayout) { 
+      const card = cards.find(c => c.id === fc.id); 
+      if (card) { card.col = fc.col; card.row = fc.row; } 
+    }
+    
+    const card = cards.find(c => c.id === dragState!.cardId);
+    if (card) card.el.classList.remove("dragging");
+    
+    dragState = null; 
+    previewCards = null;
+    render(); 
+    hidePlaceholder(); 
+    saveLayout();
+    
+    window.removeEventListener("mousemove", handleMouseMove);
+    window.removeEventListener("mouseup", handleMouseUp);
+    if (rafId) cancelAnimationFrame(rafId);
   }
 
-  function loadOrder() {
-    const saved = localStorage.getItem("bentoGridOrder");
-    if (!saved || !grid) return;
-    try {
-      const order: string[] = JSON.parse(saved);
-      const items = grid.getItems();
-      const sorted = order.map((id) => items.find((i) => i.getElement()?.dataset.id === id)).filter((i): i is Muuri.Item => !!i);
-      if (sorted.length === items.length) grid.sort(sorted, { layout: "instant" });
-    } catch (e) { console.error(e); }
+  function handleTouchStart(e: TouchEvent, card: Card) { 
+    if (e.touches.length !== 1) return; 
+    const t = e.touches[0]; 
+    handleMouseDown({ clientX: t.clientX, clientY: t.clientY, preventDefault: () => {} } as MouseEvent, card); 
+  }
+  
+  function handleTouchMove(e: TouchEvent) { 
+    if (!dragState || e.touches.length !== 1) return; 
+    e.preventDefault(); 
+    const t = e.touches[0]; 
+    handleMouseMove({ clientX: t.clientX, clientY: t.clientY } as MouseEvent); 
   }
 
-  document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", initMuuri) : initMuuri();
+  function saveLayout() { 
+    localStorage.setItem("bentoGridLayout", JSON.stringify(cards.map(c => ({ id: c.id, col: c.col, row: c.row })))); 
+  }
+  
+  function loadLayout() { 
+    const saved = localStorage.getItem("bentoGridLayout"); 
+    if (!saved) return; 
+    try { 
+      const layout = JSON.parse(saved); 
+      for (const item of layout) { 
+        const card = cards.find(c => c.id === item.id); 
+        if (card) { card.col = item.col; card.row = item.row; } 
+      } 
+    } catch (e) { console.error(e); } 
+  }
+
+  // ===== RESPONSIVE =====
+  function applyResponsive() {
+    const width = window.innerWidth;
+    
+    // Restore kích thước gốc trước
+    for (const card of cards) {
+      card.colSpan = card.baseColSpan;
+      card.rowSpan = card.baseRowSpan;
+    }
+    
+    if (width < 600) {
+      // Mobile: 1 cột, tất cả card width = 1
+      COLS = 1;
+      CELL = Math.min(BASE_CELL * 1.5, width - 64);
+      GAP = 12;
+      for (const card of cards) {
+        card.colSpan = 1;
+        card.col = 1;
+      }
+    } else if (width < 900) {
+      // Tablet: 2 cột
+      COLS = 2;
+      CELL = Math.min(BASE_CELL, (width - 80) / 2 - BASE_GAP);
+      GAP = BASE_GAP;
+      for (const card of cards) {
+        if (card.colSpan > 2) card.colSpan = 2;
+        if (card.col + card.colSpan > COLS + 1) card.col = COLS - card.colSpan + 1;
+      }
+    } else {
+      // Desktop: giữ nguyên config gốc
+      COLS = BASE_COLS;
+      CELL = BASE_CELL;
+      GAP = BASE_GAP;
+    }
+    
+    // Compact lại
+    cards = compactAll(cards, null);
+    render();
+  }
+
+  function init() {
+    gridEl = document.getElementById("bento-grid") as HTMLElement;
+    placeholderEl = document.getElementById("drag-placeholder") as HTMLElement;
+    if (!gridEl) return;
+
+    // Lưu config gốc
+    BASE_COLS = parseInt(gridEl.dataset.cols || "4");
+    BASE_CELL = parseInt(gridEl.dataset.cell || "180");
+    BASE_GAP = parseInt(gridEl.dataset.gap || "12");
+    COLS = BASE_COLS; CELL = BASE_CELL; GAP = BASE_GAP;
+
+    const cardEls = gridEl.querySelectorAll(".bento-item") as NodeListOf<HTMLElement>;
+    cards = Array.from(cardEls).map(el => ({
+      id: el.dataset.id || "",
+      col: parseInt(el.dataset.col || "1"),
+      row: parseInt(el.dataset.row || "1"),
+      colSpan: parseInt(el.dataset.colspan || "1"),
+      rowSpan: parseInt(el.dataset.rowspan || "1"),
+      // Lưu kích thước gốc
+      baseColSpan: parseInt(el.dataset.colspan || "1"),
+      baseRowSpan: parseInt(el.dataset.rowspan || "1"),
+      el
+    }));
+
+    loadLayout();
+    applyResponsive();
+
+    for (const card of cards) {
+      card.el.addEventListener("mousedown", (e) => handleMouseDown(e, card));
+      card.el.addEventListener("touchstart", (e) => handleTouchStart(e, card), { passive: false });
+    }
+    
+    window.addEventListener("touchmove", handleTouchMove, { passive: false });
+    window.addEventListener("touchend", handleMouseUp);
+    
+    // Responsive khi resize
+    let resizeTimer: number;
+    window.addEventListener("resize", () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        if (!dragState) applyResponsive();
+      }, 100);
+    });
+  }
+
+  document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", init) : init();
 </script>
