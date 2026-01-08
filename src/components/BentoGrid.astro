@@ -403,10 +403,30 @@ const { cols, cellSize, gap } = gridConfig;
           card.row = card.baseRow;
         }
       }
+      
+      // ===== FIX: Ép sắp xếp ngay để tránh nhảy khi click =====
+      // Cập nhật In-Place để giữ nguyên reference cho event listeners
+      const compacted = compactAll(cards, null);
+      for (const c of compacted) {
+        const original = cards.find(x => x.id === c.id);
+        if (original) {
+          original.col = c.col;
+          original.row = c.row;
+        }
+      }
+      // =======================================================
     }
     
     if (COLS < BASE_COLS) {
-      cards = compactAll(cards, null);
+      // Cập nhật In-Place cho Mobile/Tablet
+      const compacted = compactAll(cards, null);
+      for (const c of compacted) {
+        const original = cards.find(x => x.id === c.id);
+        if (original) {
+          original.col = c.col;
+          original.row = c.row;
+        }
+      }
     }
     render();
   }
