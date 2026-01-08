@@ -7,17 +7,19 @@ interface Props {
   buttonText: string;
 }
 
-const { emoji, name, title, bio, buttonText } = Astro.props;
+const { name, title, bio } = Astro.props;
 ---
 
 <div class="card">
-  <div>
-    <div class="memoji">{emoji}</div>
+  <div class="avatar-wrapper">
+    <img src="/avatar.png" alt={name} class="avatar" />
+  </div>
+  
+  <div class="content">
     <h1 class="name">{name}</h1>
     <p class="title">{title}</p>
     <p class="bio">{bio}</p>
   </div>
-  <button class="btn">{buttonText}</button>
 </div>
 
 <style>
@@ -30,8 +32,8 @@ const { emoji, name, title, bio, buttonText } = Astro.props;
     padding: 28px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+    gap: 24px;
+    align-items: center;
     cursor: grab;
   }
 
@@ -39,51 +41,102 @@ const { emoji, name, title, bio, buttonText } = Astro.props;
     box-shadow: 0 8px 16px rgba(0,0,0,0.08);
   }
 
-  .card:active { cursor: grabbing; }
+  .card:active { 
+    cursor: grabbing; 
+  }
 
-  .memoji {
-    width: 80px;
-    height: 80px;
+  .avatar-wrapper {
+    flex-shrink: 0;
+  }
+
+  .avatar {
+    width: 120px;
+    height: 120px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 48px;
-    margin-bottom: 20px;
+    object-fit: cover;
+    border: 4px solid #f3f4f6;
+  }
+
+  .content {
+    flex: 1;
+    min-width: 0;
   }
 
   .name {
     font-size: 32px;
     font-weight: 700;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
     color: #1a1a1a;
+    line-height: 1.2;
   }
 
   .title {
-    font-size: 18px;
+    font-size: 16px;
     color: #667eea;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
     font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
   }
 
   .bio {
     color: #4a5568;
     line-height: 1.6;
-    margin-bottom: 24px;
+    font-size: 14px;
   }
 
-  .btn {
-    background: #1a1a1a;
-    color: white;
-    border: none;
-    padding: 14px 24px;
-    border-radius: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s;
-    align-self: flex-start;
+  /* Responsive - Giữ layout ngang, chỉ thu nhỏ */
+  @media (max-width: 600px) {
+    .card {
+      padding: 16px;
+      gap: 12px;
+    }
+
+    .avatar {
+      width: 60px;
+      height: 60px;
+      border-width: 2px;
+    }
+
+    .name {
+      font-size: 18px;
+    }
+
+    .title {
+      font-size: 11px;
+      margin-bottom: 6px;
+    }
+
+    .bio {
+      font-size: 11px;
+      line-height: 1.4;
+    }
   }
 
-  .btn:hover { background: #2d3748; }
+  /* Responsive cho tablet */
+  @media (min-width: 601px) and (max-width: 900px) {
+    .card {
+      padding: 20px;
+      gap: 16px;
+    }
+
+    .avatar {
+      width: 80px;
+      height: 80px;
+      border-width: 3px;
+    }
+
+    .name {
+      font-size: 24px;
+    }
+
+    .title {
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    .bio {
+      font-size: 12px;
+    }
+  }
 </style>

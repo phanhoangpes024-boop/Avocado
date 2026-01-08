@@ -2,22 +2,28 @@
 interface Props {
   emoji: string;
   location?: string;
+  lat: number;
+  lng: number;
+  zoom?: number;
 }
 
-const { emoji, location } = Astro.props;
+const { location, lat, lng, zoom = 15 } = Astro.props;
+const mapId = `map-${Math.random().toString(36).substr(2, 9)}`;
 ---
 
 <div class="card">
-  <svg class="lines" viewBox="0 0 200 200">
-    <line x1="0" y1="50" x2="200" y2="50" stroke="#9ca3af" stroke-width="1"/>
-    <line x1="0" y1="100" x2="200" y2="100" stroke="#9ca3af" stroke-width="1"/>
-    <line x1="0" y1="150" x2="200" y2="150" stroke="#9ca3af" stroke-width="1"/>
-    <line x1="50" y1="0" x2="50" y2="200" stroke="#9ca3af" stroke-width="1"/>
-    <line x1="100" y1="0" x2="100" y2="200" stroke="#9ca3af" stroke-width="1"/>
-    <line x1="150" y1="0" x2="150" y2="200" stroke="#9ca3af" stroke-width="1"/>
-  </svg>
-  <div class="marker">{emoji}</div>
+  <div class="map-container" id={mapId} data-lat={lat} data-lng={lng} data-zoom={zoom}></div>
+  
+  <div class="avatar-marker">
+    <img src="/avatar.png" alt="Location" />
+  </div>
+  
   {location && <span class="location">{location}</span>}
+  
+  <div class="zoom-controls">
+    <button class="zoom-btn zoom-in" data-map={mapId} aria-label="Zoom in">+</button>
+    <button class="zoom-btn zoom-out" data-map={mapId} aria-label="Zoom out">−</button>
+  </div>
 </div>
 
 <style>
@@ -31,38 +37,219 @@ const { emoji, location } = Astro.props;
     cursor: grab;
   }
 
-  .card:active { cursor: grabbing; }
+  .card:active { 
+    cursor: grabbing; 
+  }
 
-  .lines {
+  .map-container {
     position: absolute;
     width: 100%;
     height: 100%;
-    opacity: 0.3;
+    z-index: 1;
   }
 
-  .marker {
+  /* Ẩn logo Leaflet */
+  .card :global(.leaflet-control-attribution) {
+    display: none;
+  }
+
+  .card :global(.leaflet-control-zoom) {
+    display: none;
+  }
+
+  .avatar-marker {
     position: absolute;
-    bottom: 40%;
+    top: 50%;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translate(-50%, -50%);
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: #667eea;
-    border: 4px solid white;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
+    border: 3px solid white;
+    background: rgba(102, 126, 234, 0.2);
+    box-shadow: 0 0 0 8px rgba(102, 126, 234, 0.15),
+                0 2px 8px rgba(0,0,0,0.15);
+    z-index: 2;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .avatar-marker img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 
   .location {
     position: absolute;
     bottom: 16px;
     left: 16px;
-    font-size: 12px;
-    color: #4a5568;
-    font-weight: 500;
+    font-size: 13px;
+    color: #1a1a1a;
+    font-weight: 600;
+    background: white;
+    padding: 8px 14px;
+    border-radius: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    z-index: 3;
+  }
+
+  .zoom-controls {
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 3;
+  }
+
+  .zoom-btn {
+    width: 44px;
+    height: 44px;
+    background: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 24px;
+    font-weight: 600;
+    color: #1a1a1a;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+  }
+
+  .zoom-btn:hover {
+    background: #f3f4f6;
+    transform: scale(1.05);
+  }
+
+  .zoom-btn:active {
+    transform: scale(0.95);
+  }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .avatar-marker {
+      width: 32px;
+      height: 32px;
+      border-width: 2px;
+      box-shadow: 0 0 0 6px rgba(102, 126, 234, 0.15),
+                  0 2px 6px rgba(0,0,0,0.15);
+    }
+
+    .location {
+      font-size: 11px;
+      padding: 6px 12px;
+      bottom: 12px;
+      left: 12px;
+    }
+
+    .zoom-controls {
+      bottom: 12px;
+      right: 12px;
+    }
+
+    .zoom-btn {
+      width: 38px;
+      height: 38px;
+      font-size: 20px;
+    }
   }
 </style>
+
+<script>
+  import L from 'leaflet';
+  import 'leaflet/dist/leaflet.css';
+
+  function initAllMaps() {
+    // Tìm tất cả các map containers
+    const mapContainers = document.querySelectorAll('.map-container');
+    
+    mapContainers.forEach((mapEl) => {
+      // Kiểm tra đã khởi tạo chưa
+      if ((mapEl as any).dataset.initialized === 'true') return;
+      
+      // Lấy tọa độ từ data attributes
+      const lat = parseFloat((mapEl as HTMLElement).dataset.lat || '0');
+      const lng = parseFloat((mapEl as HTMLElement).dataset.lng || '0');
+      const zoom = parseInt((mapEl as HTMLElement).dataset.zoom || '15');
+
+      // Tạo map với element DOM trực tiếp
+      const map = L.map(mapEl as HTMLElement, {
+        center: [lat, lng],
+        zoom: zoom,
+        zoomControl: false,
+        dragging: true,
+        scrollWheelZoom: false,
+        doubleClickZoom: true,
+        touchZoom: true
+      });
+
+      // Thêm tile layer
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '',
+        maxZoom: 19,
+        crossOrigin: true
+      }).addTo(map);
+
+      // Lưu map instance vào element
+      (mapEl as any)._leafletMap = map;
+      (mapEl as any).dataset.initialized = 'true';
+
+      // Fix kích thước
+      setTimeout(() => {
+        map.invalidateSize();
+      }, 100);
+
+      setTimeout(() => {
+        map.invalidateSize();
+      }, 500);
+    });
+
+    // Xử lý nút zoom
+    const zoomInBtns = document.querySelectorAll('.zoom-in');
+    const zoomOutBtns = document.querySelectorAll('.zoom-out');
+
+    zoomInBtns.forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const mapId = (btn as HTMLElement).dataset.map;
+        const mapEl = document.getElementById(mapId!);
+        if (mapEl && (mapEl as any)._leafletMap) {
+          (mapEl as any)._leafletMap.zoomIn();
+        }
+      });
+    });
+
+    zoomOutBtns.forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const mapId = (btn as HTMLElement).dataset.map;
+        const mapEl = document.getElementById(mapId!);
+        if (mapEl && (mapEl as any)._leafletMap) {
+          (mapEl as any)._leafletMap.zoomOut();
+        }
+      });
+    });
+
+    // Fix khi resize
+    window.addEventListener('resize', () => {
+      document.querySelectorAll('.map-container').forEach((mapEl) => {
+        if ((mapEl as any)._leafletMap) {
+          (mapEl as any)._leafletMap.invalidateSize();
+        }
+      });
+    });
+  }
+
+  // Chạy khi DOM ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAllMaps);
+  } else {
+    initAllMaps();
+  }
+</script>

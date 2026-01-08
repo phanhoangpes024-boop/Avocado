@@ -179,6 +179,54 @@ const { cols, cellSize, gap } = gridConfig;
     return result;
   }
 
+  // Thuật toán "Lấp đầy chặt" cho Mobile/Tablet: Ưu tiên lấp chỗ trống hơn là giữ thứ tự
+  function compactDense(cardList: Card[]): Card[] {
+    const result = cardList.map(c => ({ ...c }));
+    // Sắp xếp tạm các thẻ chưa đặt theo thứ tự hiện tại
+    let unplaced = result.sort((a, b) => a.row - b.row || a.col - b.col);
+    const placed: Card[] = [];
+
+    // Duyệt từng ô trên lưới (từ trên xuống dưới, từ trái qua phải)
+    // Để tìm xem có ô nào trống không
+    for (let row = 1; row <= MAX_ROWS; row++) {
+      for (let col = 1; col <= COLS; col++) {
+        // 1. Kiểm tra xem ô (col, row) này đã bị thẻ nào chiếm chưa
+        const isOccupied = placed.some(p => 
+          col >= p.col && col < p.col + p.colSpan &&
+          row >= p.row && row < p.row + p.rowSpan
+        );
+
+        if (isOccupied) continue; // Nếu đã chiếm thì bỏ qua
+
+        // 2. Nếu ô trống: Tìm trong danh sách unplaced xem có thẻ nào vừa vặn nhét vào đây không
+        const candidateIndex = unplaced.findIndex(card => {
+            // Giả lập đặt thẻ vào vị trí này
+            const testCard = { ...card, col: col, row: row };
+            
+            // Kiểm tra biên: Có bị tràn ra ngoài lưới không?
+            if (col + card.colSpan - 1 > COLS) return false;
+
+            // Kiểm tra va chạm: Có đè lên thẻ đã đặt nào không?
+            const hasCollision = placed.some(p => cardsOverlap(testCard, p));
+            return !hasCollision;
+        });
+
+        // 3. Nếu tìm thấy ứng viên phù hợp
+        if (candidateIndex !== -1) {
+            const card = unplaced[candidateIndex];
+            card.col = col;
+            card.row = row;
+            placed.push(card);
+            // Xóa khỏi danh sách chưa đặt
+            unplaced.splice(candidateIndex, 1);
+        }
+      }
+      // Nếu hết thẻ thì dừng sớm
+      if (unplaced.length === 0) break;
+    }
+    return placed;
+  }
+
   function calculateLayout(baseCards: Card[], draggedId: string, targetCol: number, targetRow: number): Card[] {
     const draggedCard = baseCards.find(c => c.id === draggedId);
     if (!draggedCard) return baseCards;
@@ -359,23 +407,39 @@ const { cols, cellSize, gap } = gridConfig;
       card.rowSpan = card.baseRowSpan;
     }
     
-    if (width < 600) {
-      COLS = 1;
-      CELL = Math.min(BASE_CELL * 1.5, width - 64);
-      GAP = 12;
-      for (const card of cards) {
-        card.colSpan = 1;
-        card.col = 1;
-      }
-    } else if (width < 900) {
+    // Gộp chung: Mobile + Tablet đều hiển thị 2 CỘT
+    if (width < 900) {
       COLS = 2;
-      CELL = Math.min(BASE_CELL, (width - 80) / 2 - BASE_GAP);
-      GAP = BASE_GAP;
+      GAP = 12;
+      
+      // Tính toán động kích thước ô để vừa màn hình
+      // Công thức: (width - padding - gap) / số cột
+      CELL = (width - 48 - GAP) / 2;
+
       for (const card of cards) {
+        // Nếu khối to quá 2 cột thì ép xuống 2
         if (card.colSpan > 2) card.colSpan = 2;
-        if (card.col + card.colSpan > COLS + 1) card.col = COLS - card.colSpan + 1;
+        
+        // Đảm bảo không bị tràn ra ngoài lưới
+        if (card.col + card.colSpan > COLS + 1) {
+          card.col = 1;
+        }
+      }
+      
+      // === DÙNG THUẬT TOÁN "LẤP ĐẦY CHẶT" CHO MOBILE/TABLET ===
+      // compactDense: Đảo thứ tự để lấp đầy mọi lỗ hổng, không để khoảng trống
+      // Kết quả: Giao diện kín mít như tường gạch (Masonry Layout)
+      const compacted = compactDense(cards);
+      
+      for (const c of compacted) {
+        const original = cards.find(x => x.id === c.id);
+        if (original) {
+          original.col = c.col;
+          original.row = c.row;
+        }
       }
     } else {
+      // Desktop Mode (>= 900px)
       COLS = BASE_COLS;
       CELL = BASE_CELL;
       GAP = BASE_GAP;
@@ -417,17 +481,6 @@ const { cols, cellSize, gap } = gridConfig;
       // =======================================================
     }
     
-    if (COLS < BASE_COLS) {
-      // Cập nhật In-Place cho Mobile/Tablet
-      const compacted = compactAll(cards, null);
-      for (const c of compacted) {
-        const original = cards.find(x => x.id === c.id);
-        if (original) {
-          original.col = c.col;
-          original.row = c.row;
-        }
-      }
-    }
     render();
   }
 

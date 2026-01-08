@@ -43,6 +43,9 @@ export interface MapCardData extends BaseGridItem {
   type: "map";
   emoji: string;
   location?: string;
+  lat: number;       // Vĩ độ (latitude)
+  lng: number;       // Kinh độ (longitude)
+  zoom?: number;     // Mức zoom (tùy chọn, mặc định 15)
 }
 
 export interface ProjectCardData extends BaseGridItem {
