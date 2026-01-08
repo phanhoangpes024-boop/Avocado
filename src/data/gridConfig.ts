@@ -25,8 +25,8 @@ export const gridItems: GridItem[] = [
 
 export const gridConfig = {
   cols: 4,
-  cellSize: 180,
-  gap: 12
+  cellSize: 270,
+  gap: 18
 };
 
 export const siteConfig = {

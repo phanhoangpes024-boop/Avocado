@@ -52,9 +52,12 @@ const { cols, cellSize, gap } = gridConfig;
     row: number; 
     colSpan: number; 
     rowSpan: number; 
-    // Lưu kích thước gốc để restore khi về desktop
+    // Lưu kích thước gốc
     baseColSpan: number;
     baseRowSpan: number;
+    // Lưu vị trí gốc
+    baseCol: number;
+    baseRow: number;
     el: HTMLElement; 
   }
   
@@ -78,6 +81,9 @@ const { cols, cellSize, gap } = gridConfig;
   
   let cards: Card[] = [];
   let dragState: DragState | null = null;
+  // --- THÊM BIẾN QUẢN LÝ TIMER CHO LONG PRESS ---
+  let dragTimer: number | null = null;
+  // ----------------------------------------------
   let previewCards: Card[] | null = null;
   let gridEl: HTMLElement, placeholderEl: HTMLElement;
   let rafId: number | null = null;
@@ -98,6 +104,42 @@ const { cols, cellSize, gap } = gridConfig;
     return true;
   }
 
+  // Hàm kiểm tra con đường từ oldRow → newRow có bị chặn bởi card nào không
+  function isPathBlocked(card: Card, oldRow: number, newRow: number, allCards: Card[]): boolean {
+    if (newRow >= oldRow) return false; // Không di chuyển lên thì không cần check
+    
+    const cardLeft = card.col;
+    const cardRight = card.col + card.colSpan - 1;
+    
+    // Kiểm tra TẤT CẢ các hàng giữa newRow và oldRow
+    for (let checkRow = newRow; checkRow < oldRow; checkRow++) {
+      // Kiểm tra TẤT CẢ cards khác
+      for (const otherCard of allCards) {
+        if (otherCard.id === card.id) continue; // Bỏ qua chính nó
+        
+        // Check xem otherCard có chiếm hàng checkRow không
+        const otherTop = otherCard.row;
+        const otherBottom = otherCard.row + otherCard.rowSpan - 1;
+        
+        if (checkRow >= otherTop && checkRow <= otherBottom) {
+          // otherCard nằm ở hàng này, check có overlap về cột không
+          const otherLeft = otherCard.col;
+          const otherRight = otherCard.col + otherCard.colSpan - 1;
+          
+          // Check overlap (dù chỉ 1 phần)
+          const hasOverlap = !(cardRight < otherLeft || cardLeft > otherRight);
+          
+          if (hasOverlap) {
+            // Có overlap → Con đường bị chặn!
+            return true;
+          }
+        }
+      }
+    }
+    
+    return false; // Con đường thoáng, không bị chặn
+  }
+
   // ===== COMPACT - Giữ nguyên cột, chỉ đẩy xuống/hút lên =====
   function compactAll(cardList: Card[], draggedId: string | null): Card[] {
     const result = cardList.map(c => ({ ...c }));
@@ -108,19 +150,33 @@ const { cols, cellSize, gap } = gridConfig;
     if (draggedCard) placedCards.push(draggedCard);
     
     for (const card of otherCards) {
+      const oldRow = card.row; // Lưu vị trí cũ
       let newRow = 1;
+      
       while (newRow <= MAX_ROWS) {
         const testCard = { ...card, row: newRow };
         let hasCollision = false;
+        
+        // Check collision với các card đã đặt
         for (const placed of placedCards) {
-          if (cardsOverlap(testCard, placed)) { hasCollision = true; break; }
+          if (cardsOverlap(testCard, placed)) { 
+            hasCollision = true; 
+            break; 
+          }
         }
-        if (!hasCollision) break;
+        
+        // Check con đường
+        if (!hasCollision && !isPathBlocked(card, oldRow, newRow, result)) {
+          break;
+        }
+        
         newRow++;
       }
+      
       card.row = newRow;
       placedCards.push(card);
     }
+    
     return result;
   }
 
@@ -195,13 +251,29 @@ const { cols, cellSize, gap } = gridConfig;
   }
 
   function handleMouseUp() {
+    // --- HỦY TIMER NẾU CÒN TỒN TẠI ---
+    if (dragTimer) { 
+      clearTimeout(dragTimer); 
+      dragTimer = null; 
+    }
+    // ---------------------------------
+    
     if (!dragState) return;
+    
+    // Lấy vị trí ban đầu của card
+    const originalCard = dragState.originalCards.find(c => c.id === dragState!.cardId);
+    const hasMoved = originalCard && (
+      originalCard.col !== dragState.targetCol || 
+      originalCard.row !== dragState.targetRow
+    );
     
     // Tính layout cuối
     let finalLayout = calculateLayout(dragState.originalCards, dragState.cardId, dragState.targetCol, dragState.targetRow);
     
-    // QUAN TRỌNG: Compact TẤT CẢ cards (không exclude ai) để hút lên
-    finalLayout = compactAll(finalLayout, null);
+    // CHỈ compact khi card THỰC SỰ di chuyển
+    if (hasMoved) {
+      finalLayout = compactAll(finalLayout, null);
+    }
     
     // Update cards
     for (const fc of finalLayout) { 
@@ -216,28 +288,61 @@ const { cols, cellSize, gap } = gridConfig;
     previewCards = null;
     render(); 
     hidePlaceholder(); 
-    saveLayout();
+    
+    // CHỈ lưu layout khi card thực sự di chuyển
+    if (hasMoved) {
+      saveLayout();
+    }
     
     window.removeEventListener("mousemove", handleMouseMove);
     window.removeEventListener("mouseup", handleMouseUp);
     if (rafId) cancelAnimationFrame(rafId);
   }
 
-  function handleTouchStart(e: TouchEvent, card: Card) { 
-    if (e.touches.length !== 1) return; 
-    const t = e.touches[0]; 
-    handleMouseDown({ clientX: t.clientX, clientY: t.clientY, preventDefault: () => {} } as MouseEvent, card); 
+  // ===== SỬA LẠI handleTouchStart - THÊM LONG PRESS =====
+  function handleTouchStart(e: TouchEvent, card: Card) {
+    if (e.touches.length !== 1) return;
+    
+    const t = e.touches[0];
+    const clientX = t.clientX;
+    const clientY = t.clientY;
+
+    // Thiết lập timer: Nếu giữ yên trong 200ms thì mới bắt đầu kéo
+    dragTimer = setTimeout(() => {
+      handleMouseDown({ 
+        clientX: clientX, 
+        clientY: clientY, 
+        preventDefault: () => { if(e.cancelable) e.preventDefault(); } 
+      } as MouseEvent, card);
+    }, 200); // 200ms là thời gian chờ hợp lý
   }
   
-  function handleTouchMove(e: TouchEvent) { 
-    if (!dragState || e.touches.length !== 1) return; 
-    e.preventDefault(); 
-    const t = e.touches[0]; 
-    handleMouseMove({ clientX: t.clientX, clientY: t.clientY } as MouseEvent); 
+  // ===== SỬA LẠI handleTouchMove - HỦY TIMER KHI SCROLL =====
+  function handleTouchMove(e: TouchEvent) {
+    // Nếu chưa vào chế độ drag (dragState chưa có) mà ngón tay đã di chuyển
+    // -> Nghĩa là người dùng đang muốn cuộn trang (Scroll)
+    // -> HỦY ngay cái timer chờ kéo đi
+    if (!dragState) {
+      if (dragTimer) {
+        clearTimeout(dragTimer);
+        dragTimer = null;
+      }
+      return; 
+    }
+
+    // Nếu đã vào chế độ drag (sau 200ms), thì chạy logic kéo thả bình thường
+    if (e.touches.length !== 1) return;
+    if (e.cancelable) e.preventDefault(); // Chặn cuộn trang khi đang kéo
+    
+    const t = e.touches[0];
+    handleMouseMove({ clientX: t.clientX, clientY: t.clientY } as MouseEvent);
   }
 
-  function saveLayout() { 
-    localStorage.setItem("bentoGridLayout", JSON.stringify(cards.map(c => ({ id: c.id, col: c.col, row: c.row })))); 
+  function saveLayout() {
+    // Chỉ lưu layout khi ở desktop (4 cột)
+    if (COLS === BASE_COLS) {
+      localStorage.setItem("bentoGridLayout", JSON.stringify(cards.map(c => ({ id: c.id, col: c.col, row: c.row })))); 
+    }
   }
   
   function loadLayout() { 
@@ -285,10 +390,39 @@ const { cols, cellSize, gap } = gridConfig;
       COLS = BASE_COLS;
       CELL = BASE_CELL;
       GAP = BASE_GAP;
+      
+      // Restore vị trí gốc hoặc load từ localStorage
+      const saved = localStorage.getItem("bentoGridLayout");
+      if (saved) {
+        // Có layout đã lưu → Load lại
+        try {
+          const layout = JSON.parse(saved);
+          for (const item of layout) {
+            const card = cards.find(c => c.id === item.id);
+            if (card) {
+              card.col = item.col;
+              card.row = item.row;
+            }
+          }
+        } catch (e) {
+          // Lỗi → Dùng vị trí gốc
+          for (const card of cards) {
+            card.col = card.baseCol;
+            card.row = card.baseRow;
+          }
+        }
+      } else {
+        // Không có layout đã lưu → Dùng vị trí gốc
+        for (const card of cards) {
+          card.col = card.baseCol;
+          card.row = card.baseRow;
+        }
+      }
     }
     
-    // Compact lại
-    cards = compactAll(cards, null);
+    if (COLS < BASE_COLS) {
+      cards = compactAll(cards, null);
+    }
     render();
   }
 
@@ -313,10 +447,12 @@ const { cols, cellSize, gap } = gridConfig;
       // Lưu kích thước gốc
       baseColSpan: parseInt(el.dataset.colspan || "1"),
       baseRowSpan: parseInt(el.dataset.rowspan || "1"),
+      // Lưu vị trí gốc
+      baseCol: parseInt(el.dataset.col || "1"),
+      baseRow: parseInt(el.dataset.row || "1"),
       el
     }));
 
-    loadLayout();
     applyResponsive();
 
     for (const card of cards) {
@@ -332,7 +468,10 @@ const { cols, cellSize, gap } = gridConfig;
     window.addEventListener("resize", () => {
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(() => {
-        if (!dragState) applyResponsive();
+        // CHỈ apply responsive khi KHÔNG đang kéo
+        if (!dragState) {
+          applyResponsive();
+        }
       }, 100);
     });
   }
