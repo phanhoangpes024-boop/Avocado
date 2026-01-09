@@ -30,14 +30,14 @@ export const gridItems: GridItem[] = [
     artist: "M83" 
   },
   { 
-    id: "twitter", 
-    type: "twitter", 
-    col: 4, 
-    row: 1, 
-    colSpan: 1, 
-    rowSpan: 1, 
-    link: "https://twitter.com" 
-  },
+  id: "twitter", 
+  type: "twitter", 
+  col: 4, 
+  row: 1, 
+  colSpan: 1, 
+  rowSpan: 1, 
+  link: "https://www.facebook.com/hector162000/"  // ← Đổi link ở đây
+},
   
   // Wide card (2x1) - Hàng 2
   { 

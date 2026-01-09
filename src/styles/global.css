@@ -12,10 +12,11 @@ html, body {
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
-  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-  color: #f8fafc;
+  background: rgb(247, 242, 242);
+  color: #1a1a1a;
   overflow-x: hidden;
   min-height: 100vh;
+  transition: background 0.3s, color 0.3s;
 }
 
 /* ===== LAYOUT ===== */
@@ -26,6 +27,7 @@ body {
   overflow-x: hidden;
   padding: 24px;
 }
+
 /* Ẩn scrollbar cho Chrome, Safari, Opera */
 .portfolio-wrapper::-webkit-scrollbar {
   display: none;
@@ -42,10 +44,101 @@ body {
   margin: 0 auto;
 }
 
-/* ===== DARK MODE ===== */
+/* ===== DARK MODE (giống nevflynn.com) ===== */
 body.dark-mode {
-  background: linear-gradient(135deg, #0f172a 0%, #020617 100%);
+  background: #000000;
+  color: #ffffff;
 }
+
+body.dark-mode .bento-grid {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* Dark Mode cho TẤT CẢ các card */
+body.dark-mode .card {
+  background: #1a1a1a !important;
+  border: 1px solid #333333 !important;
+  box-shadow: none !important;
+}
+
+body.dark-mode .card:hover {
+  background: #222222 !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important;
+}
+
+/* Text trong dark mode */
+body.dark-mode .card .name,
+body.dark-mode .card .title,
+body.dark-mode .card .song,
+body.dark-mode .card h2 {
+  color: #ffffff !important;
+}
+
+body.dark-mode .card .bio,
+body.dark-mode .card .desc,
+body.dark-mode .card .artist,
+body.dark-mode .card p {
+  color: #a0a0a0 !important;
+}
+
+body.dark-mode .card .date,
+body.dark-mode .card .count,
+body.dark-mode .card .status {
+  color: #666666 !important;
+}
+
+/* Input & Button trong dark mode */
+body.dark-mode .input {
+  background: #2a2a2a !important;
+  border-color: #444444 !important;
+  color: #ffffff !important;
+}
+
+body.dark-mode .btn {
+  background: #667eea !important;
+}
+
+/* Location tag trong dark mode */
+body.dark-mode .location {
+  background: #2a2a2a !important;
+  color: #ffffff !important;
+}
+
+/* Zoom buttons trong dark mode */
+body.dark-mode .zoom-btn {
+  background: #2a2a2a !important;
+  color: #ffffff !important;
+}
+
+body.dark-mode .zoom-btn:hover {
+  background: #333333 !important;
+}
+
+/* Avatar border trong dark mode */
+body.dark-mode .avatar {
+  border-color: #333333 !important;
+}
+
+/* Project card mockup trong dark mode */
+body.dark-mode .mockup {
+  background: #2a2a2a !important;
+}
+
+body.dark-mode .mockup + .info .name {
+  color: #ffffff !important;
+}
+
+/* Read more button trong dark mode */
+body.dark-mode .read-more {
+  background: #667eea !important;
+}
+
+/* Link trong dark mode */
+body.dark-mode .link {
+  background: #2a2a2a !important;
+  color: #ffffff !important;
+}
+
 /* ===== LEAFLET MAP FIX ===== */
 .leaflet-container {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;

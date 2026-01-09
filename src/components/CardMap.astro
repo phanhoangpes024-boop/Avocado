@@ -14,6 +14,9 @@ const mapId = `map-${Math.random().toString(36).substr(2, 9)}`;
 <div class="card">
   <div class="map-container" id={mapId} data-lat={lat} data-lng={lng} data-zoom={zoom}></div>
   
+  <!-- Lớp che để chặn tương tác với map khi drag -->
+  <div class="map-overlay"></div>
+  
   <div class="avatar-marker">
     <img src="/avatar.png" alt="Location" />
   </div>
@@ -57,6 +60,22 @@ const mapId = `map-${Math.random().toString(36).substr(2, 9)}`;
     display: none;
   }
 
+  /* ===== LỚP CHE CHẶN TƯƠNG TÁC MAP ===== */
+  .map-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    cursor: grab;
+    /* Luôn hiển thị ở mọi thiết bị */
+  }
+
+  .map-overlay:active {
+    cursor: grabbing;
+  }
+
   .avatar-marker {
     position: absolute;
     top: 50%;
@@ -69,7 +88,7 @@ const mapId = `map-${Math.random().toString(36).substr(2, 9)}`;
     background: rgba(102, 126, 234, 0.2);
     box-shadow: 0 0 0 8px rgba(102, 126, 234, 0.15),
                 0 2px 8px rgba(0,0,0,0.15);
-    z-index: 2;
+    z-index: 3;
     pointer-events: none;
     overflow: hidden;
   }
@@ -91,7 +110,7 @@ const mapId = `map-${Math.random().toString(36).substr(2, 9)}`;
     padding: 8px 14px;
     border-radius: 20px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    z-index: 3;
+    z-index: 4;
   }
 
   .zoom-controls {
@@ -101,7 +120,7 @@ const mapId = `map-${Math.random().toString(36).substr(2, 9)}`;
     display: flex;
     flex-direction: column;
     gap: 8px;
-    z-index: 3;
+    z-index: 4;
   }
 
   .zoom-btn {
@@ -131,7 +150,7 @@ const mapId = `map-${Math.random().toString(36).substr(2, 9)}`;
     transform: scale(0.95);
   }
 
-  /* Responsive */
+  /* ===== RESPONSIVE: MOBILE/TABLET ===== */
   @media (max-width: 600px) {
     .avatar-marker {
       width: 32px;
@@ -159,6 +178,8 @@ const mapId = `map-${Math.random().toString(36).substr(2, 9)}`;
       font-size: 20px;
     }
   }
+
+
 </style>
 
 <script>
@@ -166,19 +187,15 @@ const mapId = `map-${Math.random().toString(36).substr(2, 9)}`;
   import 'leaflet/dist/leaflet.css';
 
   function initAllMaps() {
-    // Tìm tất cả các map containers
     const mapContainers = document.querySelectorAll('.map-container');
     
     mapContainers.forEach((mapEl) => {
-      // Kiểm tra đã khởi tạo chưa
       if ((mapEl as any).dataset.initialized === 'true') return;
       
-      // Lấy tọa độ từ data attributes
       const lat = parseFloat((mapEl as HTMLElement).dataset.lat || '0');
       const lng = parseFloat((mapEl as HTMLElement).dataset.lng || '0');
       const zoom = parseInt((mapEl as HTMLElement).dataset.zoom || '15');
 
-      // Tạo map với element DOM trực tiếp
       const map = L.map(mapEl as HTMLElement, {
         center: [lat, lng],
         zoom: zoom,
@@ -189,32 +206,21 @@ const mapId = `map-${Math.random().toString(36).substr(2, 9)}`;
         touchZoom: true
       });
 
-      // Thêm tile layer
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '',
         maxZoom: 19,
         crossOrigin: true
       }).addTo(map);
 
-      // Lưu map instance vào element
       (mapEl as any)._leafletMap = map;
       (mapEl as any).dataset.initialized = 'true';
 
-      // Fix kích thước
-      setTimeout(() => {
-        map.invalidateSize();
-      }, 100);
-
-      setTimeout(() => {
-        map.invalidateSize();
-      }, 500);
+      setTimeout(() => map.invalidateSize(), 100);
+      setTimeout(() => map.invalidateSize(), 500);
     });
 
     // Xử lý nút zoom
-    const zoomInBtns = document.querySelectorAll('.zoom-in');
-    const zoomOutBtns = document.querySelectorAll('.zoom-out');
-
-    zoomInBtns.forEach((btn) => {
+    document.querySelectorAll('.zoom-in').forEach((btn) => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
         const mapId = (btn as HTMLElement).dataset.map;
@@ -225,7 +231,7 @@ const mapId = `map-${Math.random().toString(36).substr(2, 9)}`;
       });
     });
 
-    zoomOutBtns.forEach((btn) => {
+    document.querySelectorAll('.zoom-out').forEach((btn) => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
         const mapId = (btn as HTMLElement).dataset.map;
@@ -236,7 +242,6 @@ const mapId = `map-${Math.random().toString(36).substr(2, 9)}`;
       });
     });
 
-    // Fix khi resize
     window.addEventListener('resize', () => {
       document.querySelectorAll('.map-container').forEach((mapEl) => {
         if ((mapEl as any)._leafletMap) {
@@ -246,7 +251,6 @@ const mapId = `map-${Math.random().toString(36).substr(2, 9)}`;
     });
   }
 
-  // Chạy khi DOM ready
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initAllMaps);
   } else {
