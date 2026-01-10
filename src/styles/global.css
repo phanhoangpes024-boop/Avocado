@@ -139,16 +139,77 @@ body.dark-mode .link {
   color: #ffffff !important;
 }
 
-/* ===== LEAFLET MAP FIX ===== */
-.leaflet-container {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+/* ===== DARK MODE CHO SPOTIFY CARD ===== */
+body.dark-mode .spotify-card .loading-state,
+body.dark-mode .spotify-card .nodata-state,
+body.dark-mode .spotify-card .track-state {
+  background: #1a1a1a !important;
 }
 
-.leaflet-tile-pane {
-  opacity: 1;
+body.dark-mode .spotify-card .nodata-text .title,
+body.dark-mode .spotify-card .song {
+  color: #ffffff !important;
 }
 
-.leaflet-tile {
-  max-width: none !important;
-  max-height: none !important;
+body.dark-mode .spotify-card .nodata-text .sub,
+body.dark-mode .spotify-card .artist {
+  color: #a0a0a0 !important;
+}
+
+body.dark-mode .spotify-card .loading-state span {
+  color: #a0a0a0 !important;
+}
+
+/* Giữ màu xanh Spotify và màu spinner */
+body.dark-mode .spotify-card .spotify-logo {
+  fill: #1DB954 !important;
+}
+
+body.dark-mode .spotify-card .status-text {
+  color: #1DB954 !important;
+}
+
+body.dark-mode .spotify-card .wave-bar {
+  background: #1DB954 !important;
+}
+
+body.dark-mode .spotify-card .spinner {
+  border-color: #1DB954 !important;
+  border-top-color: transparent !important;
+}
+
+/* ===== DARK MODE CHO MAP CARD ===== */
+/* Chỉ đổi màu map thành grayscale, giữ nguyên avatar */
+body.dark-mode .leaflet-tile-pane {
+  filter: grayscale(100%) brightness(0.7) contrast(1.2);
+}
+
+/* Đổi màu các element khác trong map */
+body.dark-mode .map-container {
+  background: #1a1a1a !important;
+}
+
+body.dark-mode .location {
+  background: #2a2a2a !important;
+  color: #ffffff !important;
+}
+
+body.dark-mode .zoom-btn {
+  background: #2a2a2a !important;
+  color: #ffffff !important;
+}
+
+body.dark-mode .zoom-btn:hover {
+  background: #333333 !important;
+}
+
+/* Giữ nguyên màu avatar */
+body.dark-mode .avatar-marker {
+  border-color: #ffffff !important;
+}
+
+/* Đổi màu overlay shadow của avatar */
+body.dark-mode .avatar-marker {
+  box-shadow: 0 0 0 8px rgba(102, 126, 234, 0.25),
+              0 2px 8px rgba(0,0,0,0.3) !important;
 }

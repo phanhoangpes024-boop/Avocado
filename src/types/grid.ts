@@ -1,4 +1,4 @@
-﻿export type CardType = "intro" | "blog" | "spotify" | "twitter" | "map" | "project" | "darkmode" | "newsletter" | "partners";
+﻿export type CardType = "intro" | "blog" | "spotify" | "twitter" | "map" | "project" | "darkmode" | "newsletter" | "partners" | "tech";
 export type ProjectTheme = "pink" | "yellow" | "mint";
 
 export interface BaseGridItem {
@@ -72,6 +72,16 @@ export interface PartnersCardData extends BaseGridItem {
   footer: string;
 }
 
+export interface TechCardData extends BaseGridItem {
+  type: "tech";
+  title: string;
+  techs: {
+    name: string;
+    color: string;
+    logo: string;
+  }[];
+}
+
 export type GridItem =
   | IntroCardData
   | BlogCardData
@@ -81,4 +91,5 @@ export type GridItem =
   | ProjectCardData
   | DarkModeCardData
   | NewsletterCardData
-  | PartnersCardData;
+  | PartnersCardData
+  | TechCardData;

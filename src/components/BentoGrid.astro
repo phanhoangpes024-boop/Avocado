@@ -2,14 +2,12 @@
 import type { GridItem } from "../types/grid";
 import { gridConfig } from "../data/gridConfig";
 import CardIntro from "./CardIntro.astro";
-import CardBlog from "./CardBlog.astro";
 import CardSpotify from "./CardSpotify.astro";
 import CardTwitter from "./CardTwitter.astro";
 import CardMap from "./CardMap.astro";
-import CardProject from "./CardProject.astro";
 import CardDarkMode from "./CardDarkMode.astro";
-import CardNewsletter from "./CardNewsletter.astro";
 import CardPartners from "./CardPartners.astro";
+import CardTech from "./CardTech.astro";
 
 
 interface Props {
@@ -25,14 +23,12 @@ const { cols, cellSize, gap } = gridConfig;
   {items.map((item) => (
     <div class="bento-item" data-id={item.id} data-col={item.col} data-row={item.row} data-colspan={item.colSpan} data-rowspan={item.rowSpan}>
       {item.type === "intro" && <CardIntro emoji={item.emoji} name={item.name} title={item.title} bio={item.bio} buttonText={item.buttonText} />}
-      {item.type === "blog" && <CardBlog title={item.title} description={item.description} date={item.date} link={item.link} />}
       {item.type === "spotify" && <CardSpotify discordId={item.discordId} />}
       {item.type === "twitter" && <CardTwitter link={item.link} />}
       {item.type === "map" && <CardMap emoji={item.emoji} location={item.location} lat={item.lat} lng={item.lng} zoom={item.zoom} />}
-      {item.type === "project" && <CardProject emoji={item.emoji} name={item.name} theme={item.theme} link={item.link} />}
       {item.type === "darkmode" && <CardDarkMode />}
-      {item.type === "newsletter" && <CardNewsletter title={item.title} placeholder={item.placeholder} buttonText={item.buttonText} subscriberCount={item.subscriberCount} />}
       {item.type === "partners" && <CardPartners title={item.title} footer={item.footer} />}
+      {item.type === "tech" && <CardTech title={item.title} techs={item.techs} />}
     </div>
   ))}
 </div>
@@ -422,7 +418,7 @@ const { cols, cellSize, gap } = gridConfig;
       for (const card of cards) {
         // Nếu khối to quá 2 cột thì ép xuống 2
         if (card.colSpan > 2) card.colSpan = 2;
-        
+          card.rowSpan = 1;  // ← THÊM DÒNG NÀY       
         // Đảm bảo không bị tràn ra ngoài lưới
         if (card.col + card.colSpan > COLS + 1) {
           card.col = 1;
