@@ -1,4 +1,4 @@
-﻿import type { GridItem } from "../types/grid";
+import type { GridItem } from "../types/grid";
 
 // colSpan = số cột, rowSpan = số hàng
 export const gridItems: GridItem[] = [
@@ -13,22 +13,20 @@ export const gridItems: GridItem[] = [
     emoji: "👨‍💻", 
     name: "Hector Phan", 
     title: "Developer", 
-    bio: "Hello, tôi tên là Hector, một nhà phát triển web và ứng dụng. Tôi có thể code và design mọi trang web mà bạn muốn.", 
+    bio: "Hello, tôi là Hector ! Tôi là một Developer đến tư Sài Gòn. Tôi có thể", 
     buttonText: "" 
   },
   
   // Small cards (1x1) - Hàng 1
   { 
-    id: "spotify", 
-    type: "spotify", 
-    col: 3, 
-    row: 1, 
-    colSpan: 1, 
-    rowSpan: 1, 
-    status: "Offline. Last played", 
-    song: "Midnight City", 
-    artist: "M83" 
-  },
+  id: "spotify", 
+  type: "spotify", 
+  col: 3, 
+  row: 1, 
+  colSpan: 1, 
+  rowSpan: 1, 
+  discordId: "1459064196032495628"
+},
   { 
   id: "twitter", 
   type: "twitter", 
@@ -73,6 +71,16 @@ export const gridItems: GridItem[] = [
     row: 2, 
     colSpan: 1, 
     rowSpan: 1 
+  },
+  {
+    id: "partners",
+    type: "partners",
+    col: 1,
+    row: 5,
+    colSpan: 3,
+    rowSpan: 1,
+    title: "Trusted By",
+    footer: "And 20+ more partners"
   },
   
   // Project cards - Hàng 3

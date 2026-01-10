@@ -13,7 +13,7 @@ const { logo, nav } = Astro.props;
 ---
 
 <header class="header">
-  <div class="logo">{logo}</div>
+  <img src="/logolight.png" alt="Logo" class="logo-img" id="logo-img" />
   <nav class="nav">
     {nav.map((item) => (
       <a href={item.href}>{item.label}</a>
@@ -30,13 +30,10 @@ const { logo, nav } = Astro.props;
     padding: 0 8px;
   }
 
-  .logo {
-    font-size: 28px;
-    font-weight: 700;
-    background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+  .logo-img {
+    height: 150px;
+    width: 150px;
+    transition: opacity 0.3s;
   }
 
   .nav {
@@ -55,3 +52,24 @@ const { logo, nav } = Astro.props;
     color: #f8fafc;
   }
 </style>
+
+<script>
+  const logoImg = document.getElementById("logo-img") as HTMLImageElement;
+  let isDark = localStorage.getItem("darkMode") === "true";
+
+  function updateLogo() {
+    if (logoImg) {
+      logoImg.src = isDark ? "/logodark.png" : "/logolight.png";
+    }
+  }
+
+  updateLogo();
+
+  // Lắng nghe sự kiện darkmode toggle
+  const observer = new MutationObserver(() => {
+    isDark = document.body.classList.contains("dark-mode");
+    updateLogo();
+  });
+
+  observer.observe(document.body, { attributes: true, attributeFilter: ["class"] });
+</script>

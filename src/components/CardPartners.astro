@@ -1,0 +1,247 @@
+---
+import { readdir } from 'node:fs/promises';
+import { join } from 'node:path';
+
+interface Props {
+  title: string;
+  footer: string;
+}
+
+const { title, footer } = Astro.props;
+
+// TỰ ĐỘNG đọc tất cả file trong public/customer/
+let logos: string[] = [];
+try {
+  const customerPath = join(process.cwd(), 'public', 'customer');
+  const files = await readdir(customerPath);
+  // Lọc chỉ lấy file ảnh
+  logos = files.filter(file => /\.(png|jpg|jpeg|svg|webp)$/i.test(file));
+} catch (e) {
+  console.error('Không thể đọc thư mục customer:', e);
+}
+
+// Chia đôi cho 2 hàng
+const midPoint = Math.ceil(logos.length / 2);
+const logos1 = logos.slice(0, midPoint);
+const logos2 = logos.slice(midPoint);
+---
+
+<div class="card">
+  <!-- Header -->
+  <div class="header">
+    <h2 class="title">{title}</h2>
+  </div>
+
+  <!-- Marquee Row 1 -->
+  <div class="marquee mb-8">
+    <div class="marquee-content">
+      {logos1.map((logo) => (
+        <div class="logo-item">
+          <img src={`/customer/${logo}`} alt={logo.replace(/\.(png|jpg|jpeg|svg|webp)$/i, '')} />
+        </div>
+      ))}
+    </div>
+    <div class="marquee-content" aria-hidden="true">
+      {logos1.map((logo) => (
+        <div class="logo-item">
+          <img src={`/customer/${logo}`} alt={logo.replace(/\.(png|jpg|jpeg|svg|webp)$/i, '')} />
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <!-- Marquee Row 2 (reverse) -->
+  <div class="marquee">
+    <div class="marquee-content reverse">
+      {logos2.map((logo) => (
+        <div class="logo-item">
+          <img src={`/customer/${logo}`} alt={logo.replace(/\.(png|jpg|jpeg|svg|webp)$/i, '')} />
+        </div>
+      ))}
+    </div>
+    <div class="marquee-content reverse" aria-hidden="true">
+      {logos2.map((logo) => (
+        <div class="logo-item">
+          <img src={`/customer/${logo}`} alt={logo.replace(/\.(png|jpg|jpeg|svg|webp)$/i, '')} />
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <div class="dot"></div>
+    <span class="footer-text">{footer}</span>
+  </div>
+</div>
+
+<style>
+  .card {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: white;
+    border-radius: 24px;
+    padding: 28px 0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    cursor: grab;
+    overflow: hidden;
+  }
+
+  .card:hover {
+    box-shadow: 0 8px 16px rgba(0,0,0,0.08);
+  }
+
+  .card:active { 
+    cursor: grabbing; 
+  }
+
+  /* Header */
+  .header {
+    margin-bottom: 24px;
+    padding: 0 28px;
+  }
+
+  .title {
+    font-size: 12px;
+    font-weight: 700;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0;
+  }
+
+  /* Marquee Animation */
+  .marquee {
+    display: flex;
+    overflow: hidden;
+    user-select: none;
+    gap: 3rem;
+  }
+
+  .mb-8 {
+    margin-bottom: 2rem;
+  }
+
+  .marquee-content {
+    flex-shrink: 0;
+    display: flex;
+    justify-content: space-around;
+    gap: 3rem;
+    min-width: 100%;
+    animation: scroll 25s linear infinite;
+  }
+
+  .marquee-content.reverse {
+    animation-direction: reverse;
+    animation-duration: 30s;
+  }
+
+  @keyframes scroll {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-100%);
+    }
+  }
+
+  .marquee:hover .marquee-content {
+    animation-play-state: paused;
+  }
+
+  /* Logo Items - TẤT CẢ CÙNG SIZE */
+  .logo-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100px;
+    height: 40px;
+    transition: transform 0.3s ease;
+    flex-shrink: 0;
+  }
+
+  .logo-item:hover {
+    transform: scale(1.1);
+  }
+
+  .logo-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  /* Footer */
+  .footer {
+    margin-top: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 28px;
+  }
+
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #34d399;
+  }
+
+  .footer-text {
+    font-size: 12px;
+    color: #9ca3af;
+  }
+
+  /* Responsive - Chỉ giữ chiều cao để chữ không bị mất */
+  @media (max-width: 900px) {
+    .header {
+      margin-bottom: 16px;
+    }
+
+    .mb-8 {
+      margin-bottom: 1.5rem;
+    }
+
+    .footer {
+      margin-top: 1.5rem;
+    }
+
+    .logo-item {
+      width: 80px;
+      height: 35px;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .card {
+      padding: 20px 0;
+    }
+
+    .header {
+      margin-bottom: 12px;
+      padding: 0 16px;
+    }
+
+    .title {
+      font-size: 11px;
+    }
+
+    .logo-item {
+      width: 70px;
+      height: 30px;
+    }
+
+    .mb-8 {
+      margin-bottom: 1rem;
+    }
+
+    .footer {
+      margin-top: 1rem;
+      padding: 0 16px;
+    }
+
+    .footer-text {
+      font-size: 11px;
+    }
+  }
+</style>

@@ -1,4 +1,4 @@
-﻿export type CardType = "intro" | "blog" | "spotify" | "twitter" | "map" | "project" | "darkmode" | "newsletter";
+﻿export type CardType = "intro" | "blog" | "spotify" | "twitter" | "map" | "project" | "darkmode" | "newsletter" | "partners";
 export type ProjectTheme = "pink" | "yellow" | "mint";
 
 export interface BaseGridItem {
@@ -29,9 +29,7 @@ export interface BlogCardData extends BaseGridItem {
 
 export interface SpotifyCardData extends BaseGridItem {
   type: "spotify";
-  status: string;
-  song: string;
-  artist: string;
+  discordId: string;
 }
 
 export interface TwitterCardData extends BaseGridItem {
@@ -68,6 +66,12 @@ export interface NewsletterCardData extends BaseGridItem {
   subscriberCount: string;
 }
 
+export interface PartnersCardData extends BaseGridItem {
+  type: "partners";
+  title: string;
+  footer: string;
+}
+
 export type GridItem =
   | IntroCardData
   | BlogCardData
@@ -76,4 +80,5 @@ export type GridItem =
   | MapCardData
   | ProjectCardData
   | DarkModeCardData
-  | NewsletterCardData;
+  | NewsletterCardData
+  | PartnersCardData;

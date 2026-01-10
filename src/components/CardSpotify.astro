@@ -1,61 +1,303 @@
 ﻿---
 interface Props {
-  status: string;
-  song: string;
-  artist: string;
+  discordId: string;
 }
 
-const { status, song, artist } = Astro.props;
+const { discordId } = Astro.props;
 ---
 
-<div class="card">
-  <svg class="icon" viewBox="0 0 24 24" fill="white">
-    <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
-  </svg>
-  <div>
-    <div class="status">{status}</div>
-    <div class="song">{song}</div>
-    <div class="artist">{artist}</div>
+<div class="spotify-card" data-discord-id={discordId}>
+  <!-- Loading State -->
+  <div class="state loading-state">
+    <div class="spinner"></div>
+    <span>Đang kết nối...</span>
+  </div>
+
+  <!-- No Data State -->
+  <div class="state nodata-state" style="display: none;">
+    <svg class="spotify-logo" viewBox="0 0 24 24">
+      <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
+    </svg>
+    <div class="nodata-text">
+      <p class="title">Spotify</p>
+      <p class="sub">Chưa có dữ liệu</p>
+    </div>
+  </div>
+
+  <!-- Track State -->
+  <div class="state track-state" style="display: none;">
+    <!-- Logo Spotify -->
+    <svg class="spotify-logo" viewBox="0 0 24 24">
+      <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
+    </svg>
+
+    <!-- Status + Wave -->
+    <div class="status-row">
+      <div class="wave-container">
+        <span class="wave-bar"></span>
+        <span class="wave-bar"></span>
+        <span class="wave-bar"></span>
+        <span class="wave-bar"></span>
+      </div>
+      <span class="status-text">Offline. Last played</span>
+    </div>
+
+    <!-- Track Info -->
+    <div class="track-info">
+      <p class="song"></p>
+      <p class="artist"></p>
+    </div>
   </div>
 </div>
 
 <style>
-  .card {
+  .spotify-card {
     position: relative;
     width: 100%;
     height: 100%;
-    background: #1DB954;
     border-radius: 24px;
-    padding: 28px;
-    color: white;
+    overflow: hidden;
+    cursor: grab;
+    background: white;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+
+  .spotify-card:hover {
+    box-shadow: 0 8px 16px rgba(0,0,0,0.08);
+  }
+  .spotify-card:active { cursor: grabbing; }
+
+  .state {
+    position: absolute;
+    inset: 0;
+    padding: 24px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    cursor: grab;
   }
 
-  .card:active { cursor: grabbing; }
+  /* Loading */
+  .loading-state {
+    background: white;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    color: #a1a1aa;
+    font-size: 14px;
+  }
+  .spinner {
+    width: 32px;
+    height: 32px;
+    border: 2px solid #1DB954;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
 
-  .icon {
+  /* No Data */
+  .nodata-state {
+    background: white;
+    justify-content: space-between;
+  }
+  .nodata-text .title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0;
+  }
+  .nodata-text .sub {
+    font-size: 14px;
+    color: #a1a1aa;
+    margin: 0;
+  }
+
+  /* Logo */
+  .spotify-logo {
     width: 48px;
     height: 48px;
-    margin-bottom: 16px;
+    fill: #1DB954;
+    flex-shrink: 0;
   }
 
-  .status {
-    font-size: 12px;
-    opacity: 0.9;
+  /* Track State */
+  .track-state {
+    background: white;
+    justify-content: space-between;
+  }
+
+  /* Status Row */
+  .status-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: auto;
     margin-bottom: 8px;
   }
 
+  .status-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1DB954;
+  }
+
+  /* Wave Animation */
+  .wave-container {
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+    height: 20px;
+  }
+
+  .wave-bar {
+    width: 4px;
+    background: #1DB954;
+    border-radius: 2px;
+    animation: wave 1s ease-in-out infinite;
+  }
+
+  .wave-bar:nth-child(1) { height: 40%; animation-delay: 0s; }
+  .wave-bar:nth-child(2) { height: 70%; animation-delay: 0.15s; }
+  .wave-bar:nth-child(3) { height: 50%; animation-delay: 0.3s; }
+  .wave-bar:nth-child(4) { height: 30%; animation-delay: 0.45s; }
+
+  /* Track Info */
+  .track-info {
+    margin-top: 0;
+  }
+
   .song {
-    font-size: 18px;
+    font-size: 24px;
     font-weight: 700;
-    margin-bottom: 4px;
+    color: #1a1a1a;
+    margin: 0 0 4px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .artist {
-    font-size: 14px;
-    opacity: 0.8;
+    font-size: 16px;
+    color: #71717a;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes wave {
+    0%, 100% {
+      height: 20%;
+      opacity: 0.6;
+    }
+    50% {
+      height: 100%;
+      opacity: 1;
+    }
   }
 </style>
+
+<script>
+  interface TrackData {
+    song: string;
+    artist: string;
+  }
+
+  function initSpotifyCards() {
+    document.querySelectorAll('.spotify-card').forEach((card) => {
+      const discordId = (card as HTMLElement).dataset.discordId;
+      if (!discordId) return;
+
+      const loadingEl = card.querySelector('.loading-state') as HTMLElement;
+      const nodataEl = card.querySelector('.nodata-state') as HTMLElement;
+      const trackEl = card.querySelector('.track-state') as HTMLElement;
+      const songEl = card.querySelector('.song') as HTMLElement;
+      const artistEl = card.querySelector('.artist') as HTMLElement;
+      const statusText = card.querySelector('.status-text') as HTMLElement;
+
+      const STORAGE_KEY = `spotify_last_track_${discordId}`;
+      let memoryCache: TrackData | null = null;
+
+      const showState = (state: 'loading' | 'nodata' | 'track') => {
+        loadingEl.style.display = state === 'loading' ? 'flex' : 'none';
+        nodataEl.style.display = state === 'nodata' ? 'flex' : 'none';
+        trackEl.style.display = state === 'track' ? 'flex' : 'none';
+      };
+
+      const displayTrack = (track: TrackData, isPlaying: boolean) => {
+        showState('track');
+        songEl.textContent = track.song;
+        artistEl.textContent = track.artist;
+        
+        if (isPlaying) {
+          statusText.textContent = 'Now playing';
+          trackEl.classList.remove('offline');
+        } else {
+          statusText.textContent = 'Offline. Last played';
+          trackEl.classList.remove('offline');
+        }
+      };
+
+      const saveTrack = (track: TrackData) => {
+        memoryCache = track;
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(track));
+        } catch (e) {}
+      };
+
+      const loadSavedTrack = (): TrackData | null => {
+        try {
+          const saved = localStorage.getItem(STORAGE_KEY);
+          if (saved) {
+            const parsed = JSON.parse(saved);
+            memoryCache = parsed;
+            return parsed;
+          }
+        } catch (e) {}
+        return memoryCache;
+      };
+
+      const fetchData = async () => {
+        try {
+          const res = await fetch(`https://api.lanyard.rest/v1/users/${discordId}`);
+          const json = await res.json();
+          
+          const isPlaying = json.data.listening_to_spotify;
+          const spotify = json.data.spotify;
+
+          if (isPlaying && spotify) {
+            const track: TrackData = {
+              song: spotify.song,
+              artist: spotify.artist
+            };
+            saveTrack(track);
+            displayTrack(track, true);
+          } else {
+            const savedTrack = loadSavedTrack();
+            if (savedTrack) {
+              displayTrack(savedTrack, false);
+            } else {
+              showState('nodata');
+            }
+          }
+        } catch (e) {
+          const savedTrack = loadSavedTrack();
+          if (savedTrack) {
+            displayTrack(savedTrack, false);
+          } else {
+            showState('nodata');
+          }
+        }
+      };
+
+      fetchData();
+      setInterval(fetchData, 30000);
+    });
+  }
+
+  document.readyState === 'loading' 
+    ? document.addEventListener('DOMContentLoaded', initSpotifyCards) 
+    : initSpotifyCards();
+</script>
