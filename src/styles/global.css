@@ -213,3 +213,44 @@ body.dark-mode .avatar-marker {
   box-shadow: 0 0 0 8px rgba(102, 126, 234, 0.25),
               0 2px 8px rgba(0,0,0,0.3) !important;
 }
+/* ===== DARK MODE CHO TECH CARD ===== */
+body.dark-mode .tech-name {
+  color: #ffffff !important;
+}
+
+body.dark-mode .tech-subtitle {
+  color: #a0a0a0 !important;
+}
+
+body.dark-mode .tech-item {
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+body.dark-mode .tech-item:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Hover đổi màu theo từng tech trong dark mode */
+body.dark-mode .tech-item[data-color="wordpress"]:hover .tech-name {
+  color: rgb(33, 117, 155) !important;
+}
+
+body.dark-mode .tech-item[data-color="nodejs"]:hover .tech-name {
+  color: rgb(51, 153, 51) !important;
+}
+
+body.dark-mode .tech-item[data-color="astro"]:hover .tech-name {
+  color: rgb(255, 93, 1) !important;
+}
+
+body.dark-mode .tech-item[data-color="rust"]:hover .tech-name {
+  color: rgb(206, 65, 43) !important;
+}
+
+body.dark-mode .tech-item[data-color="react"]:hover .tech-name {
+  color: rgb(97, 218, 251) !important;
+}
+
+body.dark-mode .tech-item[data-color="typescript"]:hover .tech-name {
+  color: rgb(49, 120, 198) !important;
+}
