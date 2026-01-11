@@ -230,14 +230,7 @@ const { discordId } = Astro.props;
         showState('track');
         songEl.textContent = track.song;
         artistEl.textContent = track.artist;
-        
-        if (isPlaying) {
-          statusText.textContent = 'Now playing';
-          trackEl.classList.remove('offline');
-        } else {
-          statusText.textContent = 'Offline. Last played';
-          trackEl.classList.remove('offline');
-        }
+        statusText.textContent = isPlaying ? 'Now playing' : 'Offline. Last played';
       };
 
       const saveTrack = (track: TrackData) => {
@@ -259,7 +252,7 @@ const { discordId } = Astro.props;
         return memoryCache;
       };
 
-      const fetchData = async () => {
+      const fetchData = async (isFirstLoad = false) => {
         try {
           const res = await fetch(`https://api.lanyard.rest/v1/users/${discordId}`);
           const json = await res.json();
@@ -278,22 +271,34 @@ const { discordId } = Astro.props;
             const savedTrack = loadSavedTrack();
             if (savedTrack) {
               displayTrack(savedTrack, false);
-            } else {
+            } else if (isFirstLoad) {
               showState('nodata');
             }
           }
         } catch (e) {
-          const savedTrack = loadSavedTrack();
-          if (savedTrack) {
-            displayTrack(savedTrack, false);
-          } else {
-            showState('nodata');
+          if (isFirstLoad) {
+            const savedTrack = loadSavedTrack();
+            if (savedTrack) {
+              displayTrack(savedTrack, false);
+            } else {
+              showState('nodata');
+            }
           }
         }
       };
 
-      fetchData();
-      setInterval(fetchData, 30000);
+      // ===== Hiển thị ngay nếu có data cũ =====
+      const savedTrack = loadSavedTrack();
+      
+      if (savedTrack) {
+        displayTrack(savedTrack, false);
+        fetchData(false);
+      } else {
+        showState('loading');
+        fetchData(true);
+      }
+
+      setInterval(() => fetchData(false), 30000);
     });
   }
 

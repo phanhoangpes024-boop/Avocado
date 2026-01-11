@@ -508,6 +508,7 @@ const { cols, cellSize, gap } = gridConfig;
     }));
 
     applyResponsive();
+    triggerEntranceAnimation();  // ← Thêm dòng này
 
     for (const card of cards) {
       card.el.addEventListener("mousedown", (e) => handleMouseDown(e, card));
@@ -527,6 +528,19 @@ const { cols, cellSize, gap } = gridConfig;
       }, 100);
     });
   }
+  function triggerEntranceAnimation() {
+    // Sắp xếp card theo vị trí: hàng trên trước, cột trái trước
+    const sortedCards = [...cards].sort((a, b) => {
+      if (a.row !== b.row) return a.row - b.row;
+      return a.col - b.col;
+    });
 
+    // Thêm class animate-in cho từng card với delay
+    sortedCards.forEach((card, index) => {
+      setTimeout(() => {
+        card.el.classList.add("animate-in");
+      }, index * 150); // Mỗi card cách nhau 100ms
+    });
+  }
   document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", init) : init();
 </script>

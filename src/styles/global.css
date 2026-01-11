@@ -44,6 +44,30 @@ body {
   margin: 0 auto;
 }
 
+/* ===== STAGGER FADE + SCALE ANIMATION ===== */
+/* Ẩn card bên trong, KHÔNG ẩn bento-item */
+.bento-item .card,
+.bento-item .spotify-card {
+  opacity: 0;
+  transform: scale(0.9) translateY(20px);
+}
+
+/* Khi animate-in, card bên trong mới xuất hiện */
+.bento-item.animate-in .card,
+.bento-item.animate-in .spotify-card {
+  animation: fadeScaleIn 0.5s ease-out forwards;
+}
+
+@keyframes fadeScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
 /* ===== DARK MODE (giống nevflynn.com) ===== */
 body.dark-mode {
   background: #000000;
