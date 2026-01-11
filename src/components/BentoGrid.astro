@@ -39,20 +39,8 @@ const { cols, cellSize, gap } = gridConfig;
   margin: 0 auto; 
   background: transparent; 
   border-radius: 24px; 
-  padding: 0px;
 }
-
-@media (max-width: 900px) {
-  .bento-grid {
-    padding: 12px;
-  }
-}
-
-@media (max-width: 600px) {
-  .bento-grid {
-    padding: 8px;
-  }
-}  
+  
   /* Mặc định (Mobile/Tablet): không có cursor grab */
   .bento-item { 
     position: absolute; 
@@ -269,8 +257,8 @@ const { cols, cellSize, gap } = gridConfig;
       card.el.style.height = `${pos.h}px`;
     }
     const maxRow = Math.max(...displayCards.map(c => c.row + c.rowSpan - 1), 1);
-    gridEl.style.height = `${maxRow * CELL + (maxRow - 1) * GAP + 32}px`;
-    gridEl.style.width = `${COLS * CELL + (COLS - 1) * GAP + 32}px`;
+    gridEl.style.height = `${maxRow * CELL + (maxRow - 1) * GAP}px`;
+    gridEl.style.width = `${COLS * CELL + (COLS - 1) * GAP}px`;
   }
 
   function showPlaceholder(col: number, row: number, colSpan: number, rowSpan: number) {

@@ -30,6 +30,15 @@ const { logo, nav } = Astro.props;
     padding: 0;
   }
 
+  /* Desktop: Căn Header với BentoGrid */
+@media (min-width: 900px) {
+  .header {
+    max-width: 1134px;  /* 4 cột × 270px + 3 khoảng cách × 18px */
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
   .logo-img {
     height: 150px;
     width: 150px;

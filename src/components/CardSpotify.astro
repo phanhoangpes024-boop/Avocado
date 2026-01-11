@@ -10,7 +10,7 @@ const { discordId } = Astro.props;
   <!-- Loading State -->
   <div class="state loading-state">
     <div class="spinner"></div>
-    <span>Đang kết nối...</span>
+    <span class="loading-text">Đang kết nối...</span>
   </div>
 
   <!-- No Data State -->
@@ -31,7 +31,6 @@ const { discordId } = Astro.props;
       <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
     </svg>
 
-    <!-- Status + Wave -->
     <div class="status-row">
       <div class="wave-container">
         <span class="wave-bar"></span>
@@ -44,111 +43,127 @@ const { discordId } = Astro.props;
 
     <!-- Track Info -->
     <div class="track-info">
-      <p class="song"></p>
+      <p class="song" data-text=""></p>
       <p class="artist"></p>
     </div>
   </div>
 </div>
 
 <style>
+  /* ===== CONTAINER QUERIES: Card tự điều chỉnh ===== */
   .spotify-card {
+    /* QUAN TRỌNG: Bật Container Queries */
+    container-type: inline-size;
+    container-name: spotify-card;
+    
     position: relative;
     width: 100%;
     height: 100%;
-    border-radius: 24px;
+    border-radius: clamp(16px, 5cqi, 24px);
     overflow: hidden;
     cursor: grab;
-    background: white;
+    background: white !important; /* Force nền trắng luôn hiện */
     box-shadow: 0 1px 3px rgba(0,0,0,0.05);
   }
 
   .spotify-card:hover {
     box-shadow: 0 8px 16px rgba(0,0,0,0.08);
   }
-  .spotify-card:active { cursor: grabbing; }
+  
+  .spotify-card:active { 
+    cursor: grabbing; 
+  }
 
+  /* ===== STATES - Flex Layout ===== */
   .state {
     position: absolute;
     inset: 0;
-    padding: 24px;
+    /* Padding đỉnh/đáy cố định và đều nhau */
+    padding-top: clamp(20px, 5cqi, 28px);
+    padding-bottom: clamp(20px, 5cqi, 28px);
+    padding-left: clamp(16px, 4cqi, 24px);
+    padding-right: clamp(16px, 4cqi, 24px);
     display: flex;
     flex-direction: column;
   }
 
-  /* Loading */
+  /* ===== LOADING STATE ===== */
   .loading-state {
-    background: white;
+    background: white !important;
     align-items: center;
     justify-content: center;
-    gap: 12px;
+    gap: clamp(8px, 2cqi, 12px);
     color: #a1a1aa;
-    font-size: 14px;
+    font-size: clamp(12px, 3cqi, 14px);
   }
+
   .spinner {
-    width: 32px;
-    height: 32px;
+    width: clamp(24px, 8cqi, 32px);
+    height: clamp(24px, 8cqi, 32px);
     border: 2px solid #1DB954;
     border-top-color: transparent;
     border-radius: 50%;
     animation: spin 1s linear infinite;
   }
 
-  /* No Data */
+  /* ===== NO DATA STATE ===== */
   .nodata-state {
-    background: white;
+    background: white !important;
     justify-content: space-between;
   }
+
   .nodata-text .title {
-    font-size: 20px;
+    font-size: clamp(16px, 5cqi, 20px);
     font-weight: 700;
     color: #1a1a1a;
     margin: 0;
   }
+
   .nodata-text .sub {
-    font-size: 14px;
+    font-size: clamp(12px, 3cqi, 14px);
     color: #a1a1aa;
     margin: 0;
   }
 
-  /* Logo */
+  /* ===== LOGO ===== */
   .spotify-logo {
-    width: 48px;
-    height: 48px;
+    width: clamp(32px, 12cqi, 48px);
+    height: clamp(32px, 12cqi, 48px);
     fill: #1DB954;
     flex-shrink: 0;
   }
 
-  /* Track State */
+  /* ===== TRACK STATE ===== */
   .track-state {
-    background: white;
+    background: white !important;
     justify-content: space-between;
   }
 
-  /* Status Row */
+  /* ===== STATUS ROW ===== */
   .status-row {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: clamp(6px, 2cqi, 8px);
     margin-top: auto;
-    margin-bottom: 8px;
+    margin-bottom: clamp(6px, 2cqi, 8px);
   }
 
   .status-text {
-    font-size: 14px;
+    font-size: clamp(12px, 3cqi, 14px);
     font-weight: 600;
     color: #1DB954;
   }
 
-  /* Wave Animation */
+  /* ===== WAVE ANIMATION ===== */
   .wave-container {
     display: flex;
     align-items: flex-end;
     gap: 3px;
-    height: 20px;
+    height: clamp(16px, 5cqi, 20px);
   }
 
   .wave-bar {
-    width: 4px;
+    width: clamp(3px, 1cqi, 4px);
     background: #1DB954;
     border-radius: 2px;
     animation: wave 1s ease-in-out infinite;
@@ -159,23 +174,40 @@ const { discordId } = Astro.props;
   .wave-bar:nth-child(3) { height: 50%; animation-delay: 0.3s; }
   .wave-bar:nth-child(4) { height: 30%; animation-delay: 0.45s; }
 
-  /* Track Info */
+  /* ===== TRACK INFO - MARQUEE SCROLLING ===== */
   .track-info {
     margin-top: 0;
+    overflow: hidden; /* Quan trọng cho marquee */
   }
 
   .song {
-    font-size: 24px;
+    font-size: clamp(16px, 5cqi, 24px);
     font-weight: 700;
     color: #1a1a1a;
     margin: 0 0 4px 0;
+    
+    /* Marquee scrolling cho tên bài hát dài */
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis;
+    position: relative;
+  }
+
+  /* Nếu tên bài hát dài hơn chiều rộng thẻ, chạy marquee */
+  .song.long-text {
+    animation: marquee 10s linear infinite;
+  }
+
+  @keyframes marquee {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
   }
 
   .artist {
-    font-size: 16px;
+    font-size: clamp(13px, 3.5cqi, 16px);
     color: #71717a;
     margin: 0;
     white-space: nowrap;
@@ -183,6 +215,42 @@ const { discordId } = Astro.props;
     text-overflow: ellipsis;
   }
 
+  /* ===== CONTAINER QUERIES: Card cực nhỏ ===== */
+  @container spotify-card (max-width: 200px) {
+    .state {
+      padding-top: 16px;
+      padding-bottom: 16px;
+    }
+    
+    /* Giảm kích thước wave */
+    .wave-container {
+      height: 12px;
+    }
+    
+    .wave-bar {
+      width: 2px;
+    }
+    
+    /* Artist name nhỏ hơn nhưng vẫn hiện */
+    .artist {
+      font-size: 10px;
+    }
+    
+    /* Status text nhỏ hơn */
+    .status-text {
+      font-size: 10px;
+    }
+  }
+
+  /* ===== CONTAINER QUERIES: Card trung bình ===== */
+  @container spotify-card (min-width: 200px) and (max-width: 350px) {
+    /* Giảm số Wave bar từ 4 xuống 3 */
+    .wave-bar:nth-child(4) {
+      display: none;
+    }
+  }
+
+  /* ===== ANIMATIONS ===== */
   @keyframes spin {
     to { transform: rotate(360deg); }
   }
@@ -231,6 +299,17 @@ const { discordId } = Astro.props;
         songEl.textContent = track.song;
         artistEl.textContent = track.artist;
         statusText.textContent = isPlaying ? 'Now playing' : 'Offline. Last played';
+        
+        // ===== MARQUEE: Kiểm tra nếu tên bài hát dài hơn chiều rộng =====
+        setTimeout(() => {
+          if (songEl.scrollWidth > songEl.clientWidth) {
+            songEl.classList.add('long-text');
+            // Nhân đôi text để marquee mượt mà
+            songEl.innerHTML = track.song + ' • ' + track.song;
+          } else {
+            songEl.classList.remove('long-text');
+          }
+        }, 100);
       };
 
       const saveTrack = (track: TrackData) => {
@@ -287,7 +366,7 @@ const { discordId } = Astro.props;
         }
       };
 
-      // ===== Hiển thị ngay nếu có data cũ =====
+      // Hiển thị ngay nếu có data cũ
       const savedTrack = loadSavedTrack();
       
       if (savedTrack) {
