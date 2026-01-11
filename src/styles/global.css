@@ -42,6 +42,19 @@ body {
 .portfolio-container {
   max-width: 1200px;
   margin: 0 auto;
+  padding: 0 16px;
+}
+
+@media (max-width: 900px) {
+  .portfolio-container {
+    padding: 0 8px;
+  }
+}
+
+@media (max-width: 600px) {
+  .portfolio-container {
+    padding: 0 4px;
+  }
 }
 
 /* ===== STAGGER FADE + SCALE ANIMATION ===== */

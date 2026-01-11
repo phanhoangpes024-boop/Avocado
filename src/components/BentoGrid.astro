@@ -34,8 +34,25 @@ const { cols, cellSize, gap } = gridConfig;
 </div>
 
 <style>
-.bento-grid { position: relative; margin: 0 auto; background: transparent; border-radius: 24px; padding: 16px; }
-  
+.bento-grid { 
+  position: relative; 
+  margin: 0 auto; 
+  background: transparent; 
+  border-radius: 24px; 
+  padding: 0px;
+}
+
+@media (max-width: 900px) {
+  .bento-grid {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 600px) {
+  .bento-grid {
+    padding: 8px;
+  }
+}  
   /* Mặc định (Mobile/Tablet): không có cursor grab */
   .bento-item { 
     position: absolute; 
