@@ -287,7 +287,11 @@ const { discordId } = Astro.props;
 
       const STORAGE_KEY = `spotify_last_track_${discordId}`;
       let memoryCache: TrackData | null = null;
-
+      // ===== DATA MẶC ĐỊNH KHI CHƯA CÓ GÌ =====
+const FALLBACK_TRACK: TrackData = {
+  song: "Low",
+  artist: "Florida"
+};
       const showState = (state: 'loading' | 'nodata' | 'track') => {
         loadingEl.style.display = state === 'loading' ? 'flex' : 'none';
         nodataEl.style.display = state === 'nodata' ? 'flex' : 'none';
@@ -367,15 +371,17 @@ const { discordId } = Astro.props;
       };
 
       // Hiển thị ngay nếu có data cũ
-      const savedTrack = loadSavedTrack();
-      
-      if (savedTrack) {
-        displayTrack(savedTrack, false);
-        fetchData(false);
-      } else {
-        showState('loading');
-        fetchData(true);
-      }
+      // Hiển thị ngay nếu có data cũ
+const savedTrack = loadSavedTrack();
+
+if (savedTrack) {
+  displayTrack(savedTrack, false);
+  fetchData(false);
+} else {
+  // ===== HIỂN THỊ DATA MẶC ĐỊNH THAY VÌ LOADING =====
+  displayTrack(FALLBACK_TRACK, false);
+  fetchData(false);
+}
 
       setInterval(() => fetchData(false), 30000);
     });

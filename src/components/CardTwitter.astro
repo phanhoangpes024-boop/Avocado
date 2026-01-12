@@ -6,13 +6,13 @@ interface Props {
 const { link = "https://www.facebook.com/hector162000/" } = Astro.props;
 ---
 
-<div class="card">
-  <svg class="icon" viewBox="0 0 24 24" fill="white">
-    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-  </svg>
+<div class="card facebook-card">
+  <img src="/facebook.png" alt="Facebook" class="bg-image" id="facebook-img" />
 
   <a href={link} target="_blank" rel="noopener" class="facebook-btn" aria-label="Visit Facebook">
-    <span>→</span>
+    <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
   </a>
 </div>
 
@@ -21,7 +21,6 @@ const { link = "https://www.facebook.com/hector162000/" } = Astro.props;
     position: relative;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, #1877F2 0%, #0e5fc7 100%);
     border-radius: 24px;
     display: flex;
     align-items: center;
@@ -29,6 +28,7 @@ const { link = "https://www.facebook.com/hector162000/" } = Astro.props;
     cursor: grab;
     overflow: hidden;
     box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    background: white;
   }
 
   .card:hover {
@@ -39,55 +39,108 @@ const { link = "https://www.facebook.com/hector162000/" } = Astro.props;
     cursor: grabbing;
   }
 
-  .icon {
-    width: 64px;
-    height: 64px;
-    fill: white;
+  .bg-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+    transition: opacity 0.3s ease;
   }
 
+  /* Nút Facebook mới - style từ HTML mẫu */
   .facebook-btn {
     position: absolute;
     bottom: 16px;
     right: 16px;
-    width: 44px;
-    height: 44px;
+    width: 36px;
+    height: 36px;
     background: white;
+    border: none;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     text-decoration: none;
-    color: #1877F2;
-    font-size: 20px;
-    font-weight: 600;
-    transition: all 0.3s;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    transition: all 0.3s ease;
     z-index: 10;
   }
 
   .facebook-btn:hover {
-    background: #f0f0f0;
+    background: #000000;
     transform: scale(1.1);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
   }
 
   .facebook-btn:active {
     transform: scale(0.95);
   }
 
-  /* Responsive */
-  @media (max-width: 600px) {
-    .icon {
-      width: 48px;
-      height: 48px;
-    }
+  /* Icon mũi tên */
+  .arrow-icon {
+    width: 18px;
+    height: 18px;
+    color: #000000;
+    transition: all 0.3s ease;
+  }
 
+  .facebook-btn:hover .arrow-icon {
+    color: #ffffff;
+    transform: translateX(3px);
+  }
+
+  /* Responsive - Mobile */
+  @media (max-width: 600px) {
     .facebook-btn {
-      width: 38px;
-      height: 38px;
-      font-size: 18px;
+      width: 24px;
+      height: 24px;
+      border-width: 2.5px;
       bottom: 12px;
       right: 12px;
     }
+
+    .arrow-icon {
+      width: 15px;
+      height: 15px;
+    }
+
+    .facebook-btn:hover .arrow-icon {
+      transform: translateX(2px);
+    }
+  }
+
+  /* Responsive - Tablet */
+  @media (min-width: 601px) and (max-width: 900px) {
+    .facebook-btn {
+      width: 20px;
+      height: 20px;
+      border-width: 2.5px;
+      bottom: 14px;
+      right: 14px;
+    }
+
+    .arrow-icon {
+      width: 10px;
+      height: 10px;
+    }
   }
 </style>
+
+<script>
+  const img = document.getElementById("facebook-img") as HTMLImageElement;
+  let isDark = localStorage.getItem("darkMode") === "true";
+
+  function updateImage() {
+    if (img) {
+      img.src = isDark ? "/facebook-dark.png" : "/facebook.png";
+    }
+  }
+
+  updateImage();
+
+  const observer = new MutationObserver(() => {
+    isDark = document.body.classList.contains("dark-mode");
+    updateImage();
+  });
+
+  observer.observe(document.body, { attributes: true, attributeFilter: ["class"] });
+</script>

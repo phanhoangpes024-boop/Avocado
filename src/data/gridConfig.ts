@@ -12,8 +12,8 @@ export const gridItems: GridItem[] = [
     rowSpan: 1, 
     emoji: "👨‍💻", 
     name: "Hector Phan", 
-    title: "Developer", 
-    bio: "Hello, tôi là Hector ! Tôi là một Developer đến tư Sài Gòn. Tôi có thể", 
+    title: "FULL CYCLE DEVELOPER", 
+    bio: "Hello, tôi là Hector! Tôi có thể xây dựng và vận hành một sản phẩm web từ A đến Z (Code - Deploy - Operate). Sở trường của tôi là giải quyết trọn vẹn các vấn đề kỹ thuật để sản phẩm chạy mượt mà nhất.", 
     buttonText: "" 
   },
   
