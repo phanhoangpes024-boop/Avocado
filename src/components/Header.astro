@@ -13,7 +13,16 @@ const { logo, nav } = Astro.props;
 ---
 
 <header class="header">
-  <img src="/logolight.webp" alt="Logo" class="logo-img" id="logo-img" />
+  <!-- RESPONSIVE LOGO với width/height -->
+  <img 
+    src="/logolight.webp" 
+    alt="Logo" 
+    class="logo-img" 
+    id="logo-img"
+    width="150"
+    height="75"
+    loading="eager"
+  />
   <nav class="nav">
     {nav.map((item) => (
       <a href={item.href}>{item.label}</a>
@@ -31,13 +40,13 @@ const { logo, nav } = Astro.props;
   }
 
   /* Desktop: Căn Header với BentoGrid */
-@media (min-width: 900px) {
-  .header {
-    max-width: 1134px;  /* 4 cột × 270px + 3 khoảng cách × 18px */
-    margin-left: auto;
-    margin-right: auto;
+  @media (min-width: 900px) {
+    .header {
+      max-width: 1134px;
+      margin-left: auto;
+      margin-right: auto;
+    }
   }
-}
 
   .logo-img {
     height: 75px;

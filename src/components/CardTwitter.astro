@@ -7,7 +7,20 @@ const { link = "https://www.facebook.com/hector162000/" } = Astro.props;
 ---
 
 <div class="card facebook-card">
-  <img src="/facebook.webp" alt="Facebook" class="bg-image" id="facebook-img" />
+  <!-- LAZY LOAD + RESPONSIVE IMAGE -->
+  <img 
+    srcset="/facebook-small.webp 400w,
+            /facebook-large.webp 600w"
+    sizes="(max-width: 600px) 400px,
+           600px"
+    src="/facebook-large.webp"
+    alt="Facebook" 
+    class="bg-image" 
+    id="facebook-img"
+    width="600"
+    height="600"
+    loading="lazy"
+  />
 
   <a href={link} target="_blank" rel="noopener" class="facebook-btn" aria-label="Visit Facebook">
     <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -131,7 +144,14 @@ const { link = "https://www.facebook.com/hector162000/" } = Astro.props;
 
   function updateImage() {
     if (img) {
-      img.src = isDark ? "/facebook-dark.webp" : "/facebook.webp";
+      // Cập nhật srcset cho cả light/dark mode
+      if (isDark) {
+        img.srcset = "/facebook-dark-small.webp 400w, /facebook-dark-large.webp 600w";
+        img.src = "/facebook-dark-large.webp";
+      } else {
+        img.srcset = "/facebook-small.webp 400w, /facebook-large.webp 600w";
+        img.src = "/facebook-large.webp";
+      }
     }
   }
 

@@ -18,7 +18,19 @@ const mapId = `map-${Math.random().toString(36).substr(2, 9)}`;
   <div class="map-overlay"></div>
   
   <div class="avatar-marker">
-    <img src="/avatar.webp" alt="Location" />
+    <!-- RESPONSIVE IMAGE cho avatar -->
+    <img 
+      srcset="/avatar-small.webp 120w,
+              /avatar-medium.webp 180w,
+              /avatar-large.webp 240w"
+      sizes="(max-width: 600px) 32px,
+             40px"
+      src="/avatar-large.webp"
+      alt="Location"
+      width="40"
+      height="40"
+      loading="lazy"
+    />
   </div>
   
   {location && <span class="location">{location}</span>}
@@ -74,7 +86,6 @@ const mapId = `map-${Math.random().toString(36).substr(2, 9)}`;
     height: 100%;
     z-index: 2;
     cursor: grab;
-    /* Luôn hiển thị ở mọi thiết bị */
   }
 
   .map-overlay:active {
@@ -183,8 +194,6 @@ const mapId = `map-${Math.random().toString(36).substr(2, 9)}`;
       font-size: 20px;
     }
   }
-
-
 </style>
 
 <script>

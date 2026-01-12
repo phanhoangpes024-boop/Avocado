@@ -38,14 +38,27 @@ const logos2 = logos.slice(midPoint);
       <div class="marquee-content">
         {logos1.map((logo) => (
           <div class="logo-item">
-            <img src={`/customer/${logo}`} alt={logo.replace(/\.(png|jpg|jpeg|svg|webp)$/i, '')} />
+            <!-- LAZY LOAD + WIDTH/HEIGHT cho logo -->
+            <img 
+              src={`/customer/${logo}`} 
+              alt={logo.replace(/\.(png|jpg|jpeg|svg|webp)$/i, '')}
+              width="120"
+              height="50"
+              loading="lazy"
+            />
           </div>
         ))}
       </div>
       <div class="marquee-content" aria-hidden="true">
         {logos1.map((logo) => (
           <div class="logo-item">
-            <img src={`/customer/${logo}`} alt={logo.replace(/\.(png|jpg|jpeg|svg|webp)$/i, '')} />
+            <img 
+              src={`/customer/${logo}`} 
+              alt={logo.replace(/\.(png|jpg|jpeg|svg|webp)$/i, '')}
+              width="120"
+              height="50"
+              loading="lazy"
+            />
           </div>
         ))}
       </div>
@@ -56,14 +69,26 @@ const logos2 = logos.slice(midPoint);
       <div class="marquee-content reverse">
         {logos2.map((logo) => (
           <div class="logo-item">
-            <img src={`/customer/${logo}`} alt={logo.replace(/\.(png|jpg|jpeg|svg|webp)$/i, '')} />
+            <img 
+              src={`/customer/${logo}`} 
+              alt={logo.replace(/\.(png|jpg|jpeg|svg|webp)$/i, '')}
+              width="120"
+              height="50"
+              loading="lazy"
+            />
           </div>
         ))}
       </div>
       <div class="marquee-content reverse" aria-hidden="true">
         {logos2.map((logo) => (
           <div class="logo-item">
-            <img src={`/customer/${logo}`} alt={logo.replace(/\.(png|jpg|jpeg|svg|webp)$/i, '')} />
+            <img 
+              src={`/customer/${logo}`} 
+              alt={logo.replace(/\.(png|jpg|jpeg|svg|webp)$/i, '')}
+              width="120"
+              height="50"
+              loading="lazy"
+            />
           </div>
         ))}
       </div>
@@ -87,8 +112,8 @@ const logos2 = logos.slice(midPoint);
     position: relative;
     width: 100%;
     height: 100%;
-    background: white !important; /* Force nền trắng luôn hiện */
-    border-radius: clamp(16px, 5cqi, 24px); /* Radius cũng fluid */
+    background: white !important;
+    border-radius: clamp(16px, 5cqi, 24px);
     box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     cursor: grab;
     overflow: hidden;
@@ -109,7 +134,6 @@ const logos2 = logos.slice(midPoint);
   /* ===== HEADER - Fluid Typography ===== */
   .header {
     flex-shrink: 0;
-    /* Padding đỉnh/đáy cố định và responsive */
     padding-top: clamp(20px, 5cqi, 28px);
     padding-left: clamp(16px, 4cqi, 28px);
     padding-right: clamp(16px, 4cqi, 28px);
@@ -118,7 +142,6 @@ const logos2 = logos.slice(midPoint);
   }
 
   .title {
-    /* Font size tự scale: 10px → 12px dựa trên 3% chiều rộng card */
     font-size: clamp(10px, 3cqi, 12px);
     font-weight: 700;
     color: #9ca3af;
@@ -129,12 +152,12 @@ const logos2 = logos.slice(midPoint);
 
   /* ===== MARQUEE CONTAINER - Chiếm phần giữa ===== */
   .marquee-container {
-    flex: 1; /* Chiếm tất cả không gian còn lại */
+    flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
     gap: clamp(1rem, 4cqi, 2rem);
-    min-height: 0; /* Fix cho Firefox */
+    min-height: 0;
   }
 
   /* ===== MARQUEE ANIMATION ===== */
@@ -151,11 +174,6 @@ const logos2 = logos.slice(midPoint);
     justify-content: space-around;
     gap: clamp(2rem, 6cqi, 3rem);
     min-width: 100%;
-    
-    /* Tốc độ animation tự scale:
-       Card nhỏ (< 300px) → 20s
-       Card lớn (> 600px) → 30s
-    */
     animation: scroll 25s linear infinite;
   }
 
@@ -201,15 +219,8 @@ const logos2 = logos.slice(midPoint);
     display: flex;
     align-items: center;
     justify-content: center;
-    
-    /* Logo size tự scale:
-       Card nhỏ (< 250px) → 60px
-       Card trung bình → 15% chiều rộng card
-       Card lớn (> 800px) → Max 120px
-    */
     width: clamp(60px, 15cqi, 120px);
     height: clamp(30px, 8cqi, 50px);
-    
     transition: transform 0.3s ease;
     flex-shrink: 0;
   }
@@ -230,7 +241,6 @@ const logos2 = logos.slice(midPoint);
     display: flex;
     align-items: center;
     gap: clamp(6px, 2cqi, 8px);
-    /* Padding đáy cố định, đều với đỉnh */
     padding-left: clamp(16px, 4cqi, 28px);
     padding-right: clamp(16px, 4cqi, 28px);
     padding-bottom: clamp(20px, 5cqi, 28px);

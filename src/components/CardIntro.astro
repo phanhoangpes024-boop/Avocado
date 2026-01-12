@@ -12,7 +12,21 @@ const { name, title, bio } = Astro.props;
 
 <div class="card">
   <div class="avatar-wrapper">
-    <img src="/avatar.webp" alt={name} class="avatar" />
+    <!-- RESPONSIVE IMAGE: Tự động chọn ảnh phù hợp với màn hình -->
+    <img 
+      srcset="/avatar-small.webp 120w,
+              /avatar-medium.webp 180w,
+              /avatar-large.webp 240w"
+      sizes="(max-width: 600px) 60px,
+             (max-width: 900px) 80px,
+             120px"
+      src="/avatar-large.webp"
+      alt={name}
+      class="avatar"
+      width="120"
+      height="120"
+      loading="eager"
+    />
   </div>
   
   <div class="content">
