@@ -13,7 +13,7 @@ const { logo, nav } = Astro.props;
 ---
 
 <header class="header">
-  <img src="/logolight.png" alt="Logo" class="logo-img" id="logo-img" />
+  <img src="/logolight.webp" alt="Logo" class="logo-img" id="logo-img" />
   <nav class="nav">
     {nav.map((item) => (
       <a href={item.href}>{item.label}</a>
@@ -107,7 +107,7 @@ const { logo, nav } = Astro.props;
 
   function updateLogo() {
     if (logoImg) {
-      logoImg.src = isDark ? "/logodark.png" : "/logolight.png";
+      logoImg.src = isDark ? "/logodark.webp" : "/logolight.webp";
     }
   }
 

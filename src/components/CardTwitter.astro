@@ -7,7 +7,7 @@ const { link = "https://www.facebook.com/hector162000/" } = Astro.props;
 ---
 
 <div class="card facebook-card">
-  <img src="/facebook.png" alt="Facebook" class="bg-image" id="facebook-img" />
+  <img src="/facebook.webp" alt="Facebook" class="bg-image" id="facebook-img" />
 
   <a href={link} target="_blank" rel="noopener" class="facebook-btn" aria-label="Visit Facebook">
     <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -131,7 +131,7 @@ const { link = "https://www.facebook.com/hector162000/" } = Astro.props;
 
   function updateImage() {
     if (img) {
-      img.src = isDark ? "/facebook-dark.png" : "/facebook.png";
+      img.src = isDark ? "/facebook-dark.webp" : "/facebook.webp";
     }
   }
 
