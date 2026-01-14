@@ -1,0 +1,553 @@
+---
+interface Props {
+  feedUrl?: string;
+}
+
+const { feedUrl = "https://threads-gamma-five.vercel.app/api/public-feed" } = Astro.props;
+---
+
+<div class="card life-card" id="life-card">
+  <!-- Header -->
+  <div class="header">
+    <h2 class="title">RECENT UPDATES</h2>
+    <p class="subtitle">Latest from my social feed</p>
+  </div>
+
+  <!-- Feed Container -->
+  <div class="feed-container" id="life-feed" data-feed-url={feedUrl}>
+    <!-- Loading State -->
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <span class="loading-text">Loading updates...</span>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* ===== CONTAINER QUERIES ===== */
+  .life-card {
+    container-type: inline-size;
+    container-name: life-card;
+    
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: white !important;
+    border-radius: clamp(16px, 5cqi, 24px);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    cursor: grab;
+    overflow: hidden;
+    
+    display: flex;
+    flex-direction: column;
+  }
+
+  .life-card:hover {
+    box-shadow: 0 8px 16px rgba(0,0,0,0.08);
+  }
+
+  .life-card:active {
+    cursor: grabbing;
+  }
+
+  /* ===== HEADER (Static - Scoped OK) ===== */
+  .header {
+    flex-shrink: 0;
+    padding: clamp(20px, 5cqi, 28px);
+    padding-bottom: clamp(12px, 3cqi, 16px);
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .title {
+    font-size: clamp(10px, 3cqi, 12px);
+    font-weight: 700;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0 0 4px 0;
+  }
+
+  .subtitle {
+    font-size: clamp(11px, 2.5cqi, 13px);
+    color: #6b7280;
+    margin: 0;
+  }
+
+  /* ===== FEED CONTAINER (Static - Scoped OK) ===== */
+  .feed-container {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-height: 0;
+    padding: clamp(12px, 3cqi, 16px);
+    
+    /* Custom scrollbar */
+    scrollbar-width: thin;
+    scrollbar-color: #e5e7eb transparent;
+  }
+
+  .feed-container::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .feed-container::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .feed-container::-webkit-scrollbar-thumb {
+    background: #e5e7eb;
+    border-radius: 3px;
+  }
+
+  .feed-container::-webkit-scrollbar-thumb:hover {
+    background: #d1d5db;
+  }
+
+  /* ===== LOADING STATE (Static - Scoped OK) ===== */
+  .loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 40px 20px;
+    color: #9ca3af;
+  }
+
+  .spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid #e5e7eb;
+    border-top-color: #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .loading-text {
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  /* ===== DYNAMIC CONTENT (JS Generated - Need :global) ===== */
+  
+  .life-card :global(.thread-item) {
+    padding: clamp(12px, 3cqi, 16px);
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .life-card :global(.thread-item:hover) {
+    background: #f9fafb;
+  }
+
+  .life-card :global(.thread-item:last-child) {
+    border-bottom: none;
+  }
+
+  .life-card :global(.thread-header) {
+    display: flex;
+    gap: clamp(8px, 2cqi, 12px);
+    margin-bottom: clamp(6px, 2cqi, 8px);
+  }
+
+  .life-card :global(.avatar) {
+    flex-shrink: 0;
+    width: clamp(28px, 8cqi, 36px);
+    height: clamp(28px, 8cqi, 36px);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: clamp(12px, 3cqi, 16px);
+    font-weight: 600;
+  }
+
+  .life-card :global(.thread-meta) {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .life-card :global(.username) {
+    font-size: clamp(12px, 3cqi, 14px);
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-right: 6px;
+  }
+
+  .life-card :global(.verified-badge) {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    vertical-align: middle;
+  }
+
+  .life-card :global(.verified-badge svg) {
+    width: 100%;
+    height: 100%;
+    fill: #0095f6;
+  }
+
+  .life-card :global(.timestamp) {
+    font-size: clamp(11px, 2.5cqi, 12px);
+    color: #9ca3af;
+    margin-left: 6px;
+  }
+
+  .life-card :global(.thread-content) {
+    font-size: clamp(12px, 3cqi, 14px);
+    color: #1a1a1a;
+    line-height: 1.4;
+    margin-bottom: clamp(6px, 2cqi, 8px);
+    word-wrap: break-word;
+    
+    /* Limit to 3 lines */
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .life-card :global(.thread-images) {
+    margin-bottom: clamp(6px, 2cqi, 8px);
+  }
+
+  .life-card :global(.image-grid) {
+    display: grid;
+    gap: 4px;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .life-card :global(.image-grid.single) {
+    grid-template-columns: 1fr;
+  }
+
+  .life-card :global(.image-grid.multiple) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .life-card :global(.thread-image) {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    display: block;
+  }
+
+  .life-card :global(.thread-stats) {
+    display: flex;
+    gap: clamp(12px, 3cqi, 16px);
+    font-size: clamp(11px, 2.5cqi, 12px);
+    color: #9ca3af;
+  }
+
+  .life-card :global(.stat-item) {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .life-card :global(.stat-item svg) {
+    width: 14px;
+    height: 14px;
+    stroke: currentColor;
+    fill: none;
+  }
+
+  /* ===== LOAD MORE INDICATOR ===== */
+  .life-card :global(.load-more) {
+    padding: 16px;
+    text-align: center;
+    font-size: 12px;
+    color: #9ca3af;
+  }
+
+  /* ===== DARK MODE ===== */
+  :global(body.dark-mode) .life-card {
+    background: #1a1a1a !important;
+  }
+
+  :global(body.dark-mode) .header {
+    border-bottom-color: #333;
+  }
+
+  :global(body.dark-mode) .title {
+    color: #9ca3af;
+  }
+
+  :global(body.dark-mode) .subtitle {
+    color: #6b7280;
+  }
+
+  :global(body.dark-mode) .life-card :global(.thread-item) {
+    border-bottom-color: #333;
+  }
+
+  :global(body.dark-mode) .life-card :global(.thread-item:hover) {
+    background: #222;
+  }
+
+  :global(body.dark-mode) .life-card :global(.username),
+  :global(body.dark-mode) .life-card :global(.thread-content) {
+    color: #ffffff;
+  }
+
+  :global(body.dark-mode) .life-card :global(.timestamp),
+  :global(body.dark-mode) .life-card :global(.thread-stats) {
+    color: #9ca3af;
+  }
+
+  :global(body.dark-mode) .loading-state {
+    color: #9ca3af;
+  }
+
+  :global(body.dark-mode) .spinner {
+    border-color: #333;
+    border-top-color: #667eea;
+  }
+
+  /* ===== RESPONSIVE: Mobile ===== */
+  @media (max-width: 600px) {
+    .header {
+      padding: 16px;
+      padding-bottom: 12px;
+    }
+
+    .feed-container {
+      padding: 8px;
+    }
+
+    .life-card :global(.thread-item) {
+      padding: 12px 8px;
+    }
+  }
+</style>
+
+<script>
+  interface FeedThread {
+    id: string;
+    user_id: string;
+    content: string;
+    created_at: string;
+    likes_count: number;
+    comments_count: number;
+    reposts_count: number;
+    username: string;
+    avatar_text: string;
+    avatar_bg: string;
+    verified: boolean;
+    medias: Array<{
+      id: string;
+      url: string;
+      type: string;
+      width: number | null;
+      height: number | null;
+      order: number;
+    }>;
+  }
+
+  function initLifeCard() {
+    const feedContainer = document.getElementById('life-feed');
+    if (!feedContainer) return;
+
+    const feedUrl = feedContainer.dataset.feedUrl || '';
+    let threads: FeedThread[] = [];
+    let isLoading = false;
+    let hasMore = true;
+    let currentLimit = 10;
+
+    // Format timestamp
+    function formatTime(timestamp: string): string {
+      const date = new Date(timestamp);
+      const now = new Date();
+      const diffMs = now.getTime() - date.getTime();
+      const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+      
+      if (diffHours < 1) return 'Vừa xong';
+      if (diffHours < 24) return `${diffHours}h`;
+      if (diffHours < 48) return 'Hôm qua';
+      
+      return date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
+    }
+
+    // Render thread item
+    function renderThread(thread: FeedThread): string {
+      const images = thread.medias?.filter(m => m.type === 'image').slice(0, 4) || [];
+      const imageGridClass = images.length === 1 ? 'single' : 'multiple';
+      
+      return `
+        <div class="thread-item" data-thread-id="${thread.id}">
+          <div class="thread-header">
+            <div class="avatar" style="background: ${thread.avatar_bg}">
+              ${thread.avatar_text}
+            </div>
+            <div class="thread-meta">
+              <div>
+                <span class="username">${thread.username}</span>
+                ${thread.verified ? `
+                  <span class="verified-badge">
+                    <svg viewBox="0 0 22 22">
+                      <path d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.75-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.086-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.688-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.634.433 1.218.877 1.688.47.443 1.054.747 1.687.878.633.132 1.29.084 1.897-.136.274.586.705 1.084 1.246 1.439.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816zM9.662 14.85l-3.429-3.428 1.293-1.302 2.072 2.072 4.4-4.794 1.347 1.246z" />
+                    </svg>
+                  </span>
+                ` : ''}
+                <span class="timestamp">${formatTime(thread.created_at)}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="thread-content">${thread.content}</div>
+
+          ${images.length > 0 ? `
+            <div class="thread-images">
+              <div class="image-grid ${imageGridClass}">
+                ${images.map(img => `
+                  <img 
+                    src="${img.url}" 
+                    alt="Thread image" 
+                    class="thread-image"
+                    loading="lazy"
+                  />
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
+
+          <div class="thread-stats">
+            <span class="stat-item">
+              <svg viewBox="0 0 24 24" stroke-width="2">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+              </svg>
+              ${thread.likes_count}
+            </span>
+            <span class="stat-item">
+              <svg viewBox="0 0 24 24" stroke-width="2">
+                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+              </svg>
+              ${thread.comments_count}
+            </span>
+          </div>
+        </div>
+      `;
+    }
+
+    // Fetch threads
+    async function fetchThreads() {
+      if (isLoading || !hasMore) return;
+      
+      isLoading = true;
+      
+      try {
+        const url = `${feedUrl}?limit=${currentLimit}`;
+        const res = await fetch(url);
+        const data = await res.json();
+        
+        threads = data.threads || [];
+        
+        // Clear loading state
+        feedContainer.innerHTML = '';
+        
+        if (threads.length === 0) {
+          feedContainer.innerHTML = `
+            <div class="loading-state">
+              <span class="loading-text">No updates yet</span>
+            </div>
+          `;
+          hasMore = false;
+          return;
+        }
+        
+        // Render threads
+        threads.forEach(thread => {
+          feedContainer.insertAdjacentHTML('beforeend', renderThread(thread));
+        });
+        
+        // Add load more indicator
+        if (threads.length >= currentLimit) {
+          feedContainer.insertAdjacentHTML('beforeend', `
+            <div class="load-more" id="load-more-trigger">
+              <div class="spinner"></div>
+            </div>
+          `);
+        } else {
+          hasMore = false;
+        }
+        
+        // Attach click handlers
+        attachClickHandlers();
+        
+      } catch (error) {
+        console.error('Failed to fetch threads:', error);
+        feedContainer.innerHTML = `
+          <div class="loading-state">
+            <span class="loading-text">Failed to load updates</span>
+          </div>
+        `;
+      } finally {
+        isLoading = false;
+      }
+    }
+
+    // Attach click handlers
+    function attachClickHandlers() {
+      const threadItems = feedContainer.querySelectorAll('.thread-item');
+      threadItems.forEach(item => {
+        item.addEventListener('click', () => {
+          const threadId = item.getAttribute('data-thread-id');
+          if (threadId) {
+            window.open(`https://threads-gamma-five.vercel.app/thread/${threadId}`, '_blank');
+          }
+        });
+      });
+    }
+
+    // Infinity scroll observer
+    let observer: IntersectionObserver | null = null;
+    
+    function setupInfinityScroll() {
+      if (observer) observer.disconnect();
+      
+      observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting && hasMore && !isLoading) {
+              currentLimit += 10;
+              fetchThreads();
+            }
+          });
+        },
+        {
+          root: feedContainer,
+          rootMargin: '50px',
+          threshold: 0.1
+        }
+      );
+      
+      const trigger = document.getElementById('load-more-trigger');
+      if (trigger) {
+        observer.observe(trigger);
+      }
+    }
+
+    // Initial fetch
+    fetchThreads().then(() => {
+      setupInfinityScroll();
+    });
+    
+    // Re-observe after each fetch
+    feedContainer.addEventListener('DOMSubtreeModified', () => {
+      setupInfinityScroll();
+    }, { once: true });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initLifeCard);
+  } else {
+    initLifeCard();
+  }
+</script>

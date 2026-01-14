@@ -1,4 +1,4 @@
-﻿export type CardType = "intro" | "blog" | "spotify" | "twitter" | "map" | "project" | "darkmode" | "newsletter" | "partners" | "tech";
+﻿export type CardType = "intro" | "blog" | "spotify" | "twitter" | "map" | "project" | "darkmode" | "newsletter" | "partners" | "tech"| "life";
 export type ProjectTheme = "pink" | "yellow" | "mint";
 
 export interface BaseGridItem {
@@ -82,6 +82,11 @@ export interface TechCardData extends BaseGridItem {
   }[];
 }
 
+export interface LifeCardData extends BaseGridItem {
+  type: "life";
+  feedUrl?: string;
+}
+
 export type GridItem =
   | IntroCardData
   | BlogCardData
@@ -92,4 +97,5 @@ export type GridItem =
   | DarkModeCardData
   | NewsletterCardData
   | PartnersCardData
-  | TechCardData;
+  | TechCardData
+  | LifeCardData;  // ← THÊM DÒNG NÀY

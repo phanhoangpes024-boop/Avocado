@@ -6,8 +6,9 @@ import CardSpotify from "./CardSpotify.astro";
 import CardTwitter from "./CardTwitter.astro";
 import CardMap from "./CardMap.astro";
 import CardDarkMode from "./CardDarkMode.astro";
-import CardPartners from "./CardPartners.astro";
 import CardTech from "./CardTech.astro";
+import CardLife from "./CardLife.astro";
+
 
 
 interface Props {
@@ -27,8 +28,8 @@ const { cols, cellSize, gap } = gridConfig;
       {item.type === "twitter" && <CardTwitter link={item.link} />}
       {item.type === "map" && <CardMap emoji={item.emoji} location={item.location} lat={item.lat} lng={item.lng} zoom={item.zoom} />}
       {item.type === "darkmode" && <CardDarkMode />}
-      {item.type === "partners" && <CardPartners title={item.title} footer={item.footer} />}
       {item.type === "tech" && <CardTech title={item.title} techs={item.techs} />}
+      {item.type === "life" && <CardLife feedUrl={item.feedUrl} />}
     </div>
   ))}
 </div>

@@ -92,18 +92,17 @@ export const gridItems: GridItem[] = [
   }
 ]
   },
-  
-  // Partners - Hàng 5
   {
-    id: "partners",
-    type: "partners",
-    col: 2,
-    row: 5,
-    colSpan: 3,
-    rowSpan: 1,
-    title: "Trusted By",
-    footer: "And 20+ more partners"
+    id: "life",
+    type: "life",
+    col: 1,
+    row: 2,
+    colSpan: 2,
+    rowSpan: 2,
+    feedUrl: "https://threads-gamma-five.vercel.app/api/public-feed"
   }
+  
+  
 ];
 
 export const gridConfig = {
@@ -115,8 +114,10 @@ export const gridConfig = {
 export const siteConfig = {
   logo: "nev",
   nav: [
-    { label: "Work", href: "#work" },
+
+    { label: "All", href: "" },
     { label: "About", href: "#about" },
+    { label: "Work", href: "#work" },
     { label: "Contact", href: "#contact" }
   ]
 };
