@@ -556,7 +556,6 @@ const { feedUrl = "/api/life-feed" } = Astro.props;
     let threads: FeedThread[] = [];
     let isLoading = false;
     let hasMore = true;
-    let currentLimit = 10;
 
     function formatTime(timestamp: string): string {
       const date = new Date(timestamp);
@@ -571,13 +570,11 @@ const { feedUrl = "/api/life-feed" } = Astro.props;
       return date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
     }
 
-    // Render Image Gallery với 3 modes
     function renderImageGallery(medias: FeedMedia[]): string {
       const images = medias.filter(m => m.type === 'image').sort((a, b) => a.order - b.order);
       
       if (images.length === 0) return '';
       
-      // CASE 1: Single Image
       if (images.length === 1) {
         const img = images[0];
         const aspectRatio = img.width && img.height ? `${img.width}/${img.height}` : 'auto';
@@ -598,7 +595,6 @@ const { feedUrl = "/api/life-feed" } = Astro.props;
         `;
       }
       
-      // CASE 2: Grid 2 Images
       if (images.length === 2) {
         return `
           <div class="gallery">
@@ -620,7 +616,6 @@ const { feedUrl = "/api/life-feed" } = Astro.props;
         `;
       }
       
-      // CASE 3+: Horizontal Scroll Chain
       const MAX_VISIBLE = 5;
       const displayImages = images.slice(0, MAX_VISIBLE);
       const remainingCount = images.length - MAX_VISIBLE;
@@ -711,42 +706,72 @@ const { feedUrl = "/api/life-feed" } = Astro.props;
       `;
     }
 
+    // ✅ SỬA: Xóa loading trigger cũ trước khi tải thêm
+    function removeLoadingTrigger() {
+      const oldTrigger = document.getElementById('load-more-trigger');
+      if (oldTrigger) {
+        oldTrigger.remove();
+      }
+    }
+
     async function fetchThreads() {
       if (isLoading || !hasMore) return;
       
       isLoading = true;
       
+      // ✅ SỬA: Xóa loading trigger cũ ngay khi bắt đầu fetch
+      removeLoadingTrigger();
+      
       try {
-        const url = `${feedUrl}?limit=${currentLimit}`;
+        const lastThread = threads[threads.length - 1];
+        const cursorParams = lastThread 
+          ? `&cursor_time=${lastThread.created_at}&cursor_id=${lastThread.id}` 
+          : '';
+        const url = `${feedUrl}?limit=10${cursorParams}`;
+        
         const res = await fetch(url);
         const data = await res.json();
         
-        threads = data.threads || [];
+        const newThreads = data.threads || [];
         
-        feedContainer.innerHTML = '';
-        
+        // ✅ SỬA: Xử lý lần load đầu tiên
         if (threads.length === 0) {
-          feedContainer.innerHTML = `
-            <div class="loading-state">
-              <span class="loading-text">No updates yet</span>
-            </div>
-          `;
-          hasMore = false;
-          return;
+          // Xóa loading state ban đầu
+          feedContainer.innerHTML = '';
+          
+          if (newThreads.length === 0) {
+            feedContainer.innerHTML = `
+              <div class="loading-state">
+                <span class="loading-text">No updates yet</span>
+              </div>
+            `;
+            hasMore = false;
+            return;
+          }
         }
         
-        threads.forEach(thread => {
+        // Thêm bài viết mới vào mảng
+        threads = [...threads, ...newThreads];
+        
+        // Render các bài viết mới
+        newThreads.forEach((thread: FeedThread) => {
           feedContainer.insertAdjacentHTML('beforeend', renderThread(thread));
         });
         
-        if (threads.length >= currentLimit) {
+        // ✅ SỬA: Kiểm tra còn dữ liệu không dựa vào số lượng trả về
+        if (newThreads.length < 10) {
+          // Server trả về ít hơn 10 bài => hết dữ liệu
+          hasMore = false;
+        } else {
+          // Còn dữ liệu => thêm loading trigger mới
           feedContainer.insertAdjacentHTML('beforeend', `
             <div class="load-more" id="load-more-trigger">
               <div class="spinner"></div>
             </div>
           `);
-        } else {
-          hasMore = false;
+          
+          // ✅ SỬA: Setup observer cho trigger mới ngay sau khi thêm
+          setupInfinityScroll();
         }
         
         attachClickHandlers();
@@ -759,6 +784,7 @@ const { feedUrl = "/api/life-feed" } = Astro.props;
             <span class="loading-text">Failed to load updates</span>
           </div>
         `;
+        hasMore = false;
       } finally {
         isLoading = false;
       }
@@ -776,7 +802,6 @@ const { feedUrl = "/api/life-feed" } = Astro.props;
       });
     }
 
-    // Carousel drag logic (simplified)
     function setupCarouselDrag() {
       const carousels = feedContainer.querySelectorAll('.chainScroll');
       
@@ -814,37 +839,40 @@ const { feedUrl = "/api/life-feed" } = Astro.props;
       });
     }
 
-    // Infinity scroll
+    // ✅ SỬA: Observer được tạo lại mỗi lần có trigger mới
     let observer: IntersectionObserver | null = null;
     
     function setupInfinityScroll() {
-      if (observer) observer.disconnect();
+      // Disconnect observer cũ nếu có
+      if (observer) {
+        observer.disconnect();
+      }
       
+      // Tạo observer mới
       observer = new IntersectionObserver(
         (entries) => {
           entries.forEach(entry => {
             if (entry.isIntersecting && hasMore && !isLoading) {
-              currentLimit += 10;
               fetchThreads();
             }
           });
         },
         {
           root: feedContainer,
-          rootMargin: '0px',
-          threshold: 1
+          rootMargin: '100px', // ✅ SỬA: Tăng rootMargin để load sớm hơn
+          threshold: 0.1
         }
       );
       
+      // Observe trigger mới
       const trigger = document.getElementById('load-more-trigger');
       if (trigger) {
         observer.observe(trigger);
       }
     }
 
-    fetchThreads().then(() => {
-      setupInfinityScroll();
-    });
+    // Khởi tạo - chỉ gọi fetchThreads 1 lần
+    fetchThreads();
   }
 
   if (document.readyState === 'loading') {
