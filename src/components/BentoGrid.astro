@@ -414,22 +414,29 @@ const { cols, cellSize, gap } = gridConfig;
     
     // Gộp chung: Mobile + Tablet đều hiển thị 2 CỘT
     if (width < 900) {
-      COLS = 2;
-      GAP = 12;
-      
-      // Tính toán động kích thước ô để vừa màn hình
-      // Công thức: (width - padding - gap) / số cột
-      CELL = (width - 48 - GAP) / 2;
+  COLS = 2;
+  GAP = 12;
+  
+  // Tính toán động kích thước ô để vừa màn hình
+  // Công thức: (width - padding - gap) / số cột
+  CELL = (width - 48 - GAP) / 2;
 
-      for (const card of cards) {
-        // Nếu khối to quá 2 cột thì ép xuống 2
-        if (card.colSpan > 2) card.colSpan = 2;
-          card.rowSpan = 1;  // ← THÊM DÒNG NÀY       
-        // Đảm bảo không bị tràn ra ngoài lưới
-        if (card.col + card.colSpan > COLS + 1) {
-          card.col = 1;
-        }
-      }
+  for (const card of cards) {
+    // Nếu khối to quá 2 cột thì ép xuống 2
+    if (card.colSpan > 2) card.colSpan = 2;
+    
+    // ✅ QUAN TRỌNG: Card Life giữ nguyên 2x2, các card khác về 1x1
+    if (card.id === 'life') {
+      card.rowSpan = 2;  // Giữ nguyên chiều cao 2 hàng
+    } else {
+      card.rowSpan = 1;  // Các card khác chỉ 1 hàng
+    }
+    
+    // Đảm bảo không bị tràn ra ngoài lưới
+    if (card.col + card.colSpan > COLS + 1) {
+      card.col = 1;
+    }
+  }
       
       // === DÙNG THUẬT TOÁN "LẤP ĐẦY CHẶT" CHO MOBILE/TABLET ===
       // compactDense: Đảo thứ tự để lấp đầy mọi lỗ hổng, không để khoảng trống

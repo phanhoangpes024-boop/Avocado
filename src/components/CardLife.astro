@@ -3,7 +3,7 @@ interface Props {
   feedUrl?: string;
 }
 
-const { feedUrl = "https://threads-gamma-five.vercel.app/api/public-feed" } = Astro.props;
+const { feedUrl = "/api/life-feed" } = Astro.props;
 ---
 
 <div class="card life-card" id="life-card">
@@ -24,7 +24,7 @@ const { feedUrl = "https://threads-gamma-five.vercel.app/api/public-feed" } = As
 </div>
 
 <style>
-  /* ===== CONTAINER QUERIES ===== */
+  /* ===== CARD CONTAINER ===== */
   .life-card {
     container-type: inline-size;
     container-name: life-card;
@@ -50,16 +50,16 @@ const { feedUrl = "https://threads-gamma-five.vercel.app/api/public-feed" } = As
     cursor: grabbing;
   }
 
-  /* ===== HEADER (Static - Scoped OK) ===== */
+  /* ===== HEADER ===== */
   .header {
     flex-shrink: 0;
-    padding: clamp(20px, 5cqi, 28px);
+    padding: clamp(16px, 4cqi, 20px);
     padding-bottom: clamp(12px, 3cqi, 16px);
     border-bottom: 1px solid #f0f0f0;
   }
 
   .title {
-    font-size: clamp(10px, 3cqi, 12px);
+    font-size: clamp(10px, 2.5cqi, 12px);
     font-weight: 700;
     color: #9ca3af;
     text-transform: uppercase;
@@ -68,20 +68,19 @@ const { feedUrl = "https://threads-gamma-five.vercel.app/api/public-feed" } = As
   }
 
   .subtitle {
-    font-size: clamp(11px, 2.5cqi, 13px);
+    font-size: clamp(10px, 2.5cqi, 12px);
     color: #6b7280;
     margin: 0;
   }
 
-  /* ===== FEED CONTAINER (Static - Scoped OK) ===== */
+  /* ===== FEED CONTAINER ===== */
   .feed-container {
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
     min-height: 0;
-    padding: clamp(12px, 3cqi, 16px);
+    background: #ffffff;
     
-    /* Custom scrollbar */
     scrollbar-width: thin;
     scrollbar-color: #e5e7eb transparent;
   }
@@ -103,7 +102,7 @@ const { feedUrl = "https://threads-gamma-five.vercel.app/api/public-feed" } = As
     background: #d1d5db;
   }
 
-  /* ===== LOADING STATE (Static - Scoped OK) ===== */
+  /* ===== LOADING STATE ===== */
   .loading-state {
     display: flex;
     flex-direction: column;
@@ -115,9 +114,9 @@ const { feedUrl = "https://threads-gamma-five.vercel.app/api/public-feed" } = As
   }
 
   .spinner {
-    width: 32px;
-    height: 32px;
-    border: 3px solid #e5e7eb;
+    width: 24px;
+    height: 24px;
+    border: 2px solid #e5e7eb;
     border-top-color: #667eea;
     border-radius: 50%;
     animation: spin 1s linear infinite;
@@ -128,82 +127,92 @@ const { feedUrl = "https://threads-gamma-five.vercel.app/api/public-feed" } = As
   }
 
   .loading-text {
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 500;
   }
 
-  /* ===== DYNAMIC CONTENT (JS Generated - Need :global) ===== */
-  
-  .life-card :global(.thread-item) {
+  /* ===== THREAD CARD - GIỮ NGUYÊN CẤU TRÚC GỐC ===== */
+  .life-card :global(.threadCard) {
+    width: 100%;
     padding: clamp(12px, 3cqi, 16px);
     border-bottom: 1px solid #f0f0f0;
+    background: #ffffff;
     cursor: pointer;
-    transition: background 0.2s;
   }
 
-  .life-card :global(.thread-item:hover) {
+  .life-card :global(.threadCard:hover) {
     background: #f9fafb;
   }
 
-  .life-card :global(.thread-item:last-child) {
-    border-bottom: none;
-  }
-
-  .life-card :global(.thread-header) {
+  .life-card :global(.threadContainer) {
     display: flex;
     gap: clamp(8px, 2cqi, 12px);
-    margin-bottom: clamp(6px, 2cqi, 8px);
+  }
+
+  .life-card :global(.threadAvatar) {
+    flex-shrink: 0;
   }
 
   .life-card :global(.avatar) {
-    flex-shrink: 0;
-    width: clamp(28px, 8cqi, 36px);
-    height: clamp(28px, 8cqi, 36px);
+    width: clamp(32px, 8cqi, 40px);
+    height: clamp(32px, 8cqi, 40px);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
-    font-size: clamp(12px, 3cqi, 16px);
+    color: #ffffff;
+    font-size: clamp(14px, 4cqi, 18px);
     font-weight: 600;
   }
 
-  .life-card :global(.thread-meta) {
+  .life-card :global(.threadContent) {
     flex: 1;
     min-width: 0;
   }
 
+  .life-card :global(.threadHeader) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: clamp(4px, 1.5cqi, 6px);
+  }
+
+  .life-card :global(.threadHeaderLeft) {
+    display: flex;
+    align-items: center;
+    gap: clamp(4px, 1.5cqi, 6px);
+    min-width: 0;
+  }
+
   .life-card :global(.username) {
-    font-size: clamp(12px, 3cqi, 14px);
     font-weight: 600;
-    color: #1a1a1a;
-    margin-right: 6px;
+    color: #000000;
+    font-size: clamp(12px, 3cqi, 14px);
   }
 
-  .life-card :global(.verified-badge) {
-    display: inline-block;
-    width: 14px;
-    height: 14px;
-    vertical-align: middle;
+  .life-card :global(.verifiedBadge) {
+    width: clamp(12px, 3cqi, 14px);
+    height: clamp(12px, 3cqi, 14px);
+    flex-shrink: 0;
   }
 
-  .life-card :global(.verified-badge svg) {
+  .life-card :global(.verifiedBadge svg) {
     width: 100%;
     height: 100%;
     fill: #0095f6;
   }
 
   .life-card :global(.timestamp) {
-    font-size: clamp(11px, 2.5cqi, 12px);
-    color: #9ca3af;
-    margin-left: 6px;
+    color: #999999;
+    font-size: clamp(11px, 2.5cqi, 13px);
+    white-space: nowrap;
   }
 
-  .life-card :global(.thread-content) {
+  .life-card :global(.threadText) {
+    color: #000000;
     font-size: clamp(12px, 3cqi, 14px);
-    color: #1a1a1a;
     line-height: 1.4;
-    margin-bottom: clamp(6px, 2cqi, 8px);
+    margin-bottom: clamp(8px, 2cqi, 10px);
     word-wrap: break-word;
     
     /* Limit to 3 lines */
@@ -213,58 +222,240 @@ const { feedUrl = "https://threads-gamma-five.vercel.app/api/public-feed" } = As
     overflow: hidden;
   }
 
-  .life-card :global(.thread-images) {
-    margin-bottom: clamp(6px, 2cqi, 8px);
-  }
-
-  .life-card :global(.image-grid) {
-    display: grid;
-    gap: 4px;
-    border-radius: 8px;
-    overflow: hidden;
-  }
-
-  .life-card :global(.image-grid.single) {
-    grid-template-columns: 1fr;
-  }
-
-  .life-card :global(.image-grid.multiple) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .life-card :global(.thread-image) {
+  /* ===== IMAGE GALLERY - GIỮ NGUYÊN LOGIC GỐC ===== */
+  
+  .life-card :global(.gallery) {
     width: 100%;
-    aspect-ratio: 1;
-    object-fit: cover;
+    position: relative;
     display: block;
+    margin-bottom: clamp(8px, 2cqi, 10px);
   }
 
-  .life-card :global(.thread-stats) {
+  /* CASE 1: Single Image - Contain Mode */
+  .life-card :global(.layoutSingle) {
+    width: 100%;
+    border-radius: clamp(8px, 2cqi, 12px);
+    overflow: hidden;
+    background: transparent;
+    position: relative;
+  }
+
+  .life-card :global(.singleWrapper) {
+    width: 100%;
+    position: relative;
     display: flex;
-    gap: clamp(12px, 3cqi, 16px);
-    font-size: clamp(11px, 2.5cqi, 12px);
-    color: #9ca3af;
+    align-items: center;
+    justify-content: center;
+    min-height: clamp(150px, 40cqi, 200px);
+    max-height: clamp(200px, 50cqi, 280px);
   }
 
-  .life-card :global(.stat-item) {
+  .life-card :global(.singleImage) {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    display: block;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .life-card :global(.singleImage.loaded) {
+    opacity: 1;
+  }
+
+  /* CASE 2: Grid 2 Images */
+  .life-card :global(.gridTwo) {
+    display: flex;
+    gap: 4px;
+  }
+
+  .life-card :global(.gridTwoItem) {
+    flex: 1;
+    width: calc(50% - 2px);
+    height: auto;
+    max-height: clamp(120px, 35cqi, 180px);
+    position: relative;
+    border-radius: clamp(6px, 2cqi, 8px);
+    overflow: hidden;
+    background: transparent;
+    border: 1px solid #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .life-card :global(.gridTwoImage) {
+    width: 100%;
+    height: 100%;
+    max-height: clamp(120px, 35cqi, 180px);
+    object-fit: cover;
+    object-position: center;
+    display: block;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .life-card :global(.gridTwoImage.loaded) {
+    opacity: 1;
+  }
+
+  /* CASE 3+: Horizontal Scroll Chain */
+  .life-card :global(.chainWrapper) {
+  /* Tràn ra ngoài để sát mép card */
+  margin-left: calc(
+    -1 * (
+      clamp(32px, 8cqi, 40px)    /* avatar width */
+      + clamp(8px, 2cqi, 12px)   /* gap */
+      + clamp(12px, 3cqi, 16px)  /* threadCard padding */
+    )
+  );
+  
+  /* Tăng width tương ứng */
+  width: calc(
+    100% 
+    + clamp(32px, 8cqi, 40px)    /* avatar width */
+    + clamp(8px, 2cqi, 12px)     /* gap */
+    + clamp(12px, 3cqi, 16px)    /* threadCard padding left */
+    + clamp(12px, 3cqi, 16px)    /* threadCard padding right */
+  );
+  
+  position: relative;
+}
+
+  .life-card :global(.chainScroll) {
+    display: flex;
+    gap: clamp(4px, 1.5cqi, 6px);
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    -webkit-overflow-scrolling: touch;
+    cursor: grab;
+    user-select: none;
+    touch-action: pan-x;
+    padding-left: clamp(12px, 3cqi, 16px); /* Padding trái cho item đầu */
+  padding-right: clamp(12px, 3cqi, 16px); /* Padding phải cho item cuối */
+  }
+
+  .life-card :global(.chainScroll::-webkit-scrollbar) {
+    display: none;
+  }
+
+  .life-card :global(.chainScroll.isDragging) {
+    scroll-snap-type: none !important;
+    cursor: grabbing !important;
+  }
+
+  .life-card :global(.chainItem) {
+    flex: 0 0 clamp(100px, 28cqi, 140px);
+    width: clamp(100px, 28cqi, 140px);
+    height: clamp(130px, 36cqi, 180px);
+    position: relative;
+    border-radius: clamp(6px, 2cqi, 8px);
+    overflow: hidden;
+    background: transparent;
+    scroll-snap-align: center;
+    border: 1px solid #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .life-card :global(.chainImage) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .life-card :global(.chainImage.loaded) {
+    opacity: 1;
+  }
+
+  .life-card :global(.skeleton) {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, #f0f0f0 0%, #e0e0e0 50%, #f0f0f0 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+    z-index: 1;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  .life-card :global(.overlay) {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    border-radius: clamp(6px, 2cqi, 8px);
+  }
+
+  .life-card :global(.overlay span) {
+    color: white;
+    font-size: clamp(16px, 4cqi, 20px);
+    font-weight: 600;
+  }
+
+  /* ===== THREAD ACTIONS ===== */
+  .life-card :global(.threadActions) {
+    display: flex;
+    align-items: center;
+    gap: clamp(12px, 3cqi, 16px);
+    padding-top: 4px;
+  }
+
+  .life-card :global(.actionButton) {
     display: flex;
     align-items: center;
     gap: 4px;
+    pointer-events: none;
   }
 
-  .life-card :global(.stat-item svg) {
-    width: 14px;
-    height: 14px;
-    stroke: currentColor;
+  .life-card :global(.actionIcon) {
+    width: clamp(24px, 6cqi, 28px);
+    height: clamp(24px, 6cqi, 28px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+  }
+
+  .life-card :global(.actionIcon svg) {
+    width: clamp(14px, 4cqi, 16px);
+    height: clamp(14px, 4cqi, 16px);
+    stroke: #999999;
     fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
   }
 
-  /* ===== LOAD MORE INDICATOR ===== */
+  .life-card :global(.actionCount) {
+    color: #999999;
+    font-size: clamp(11px, 2.5cqi, 13px);
+    font-weight: 400;
+  }
+
+  /* ===== LOAD MORE ===== */
   .life-card :global(.load-more) {
     padding: 16px;
     text-align: center;
-    font-size: 12px;
-    color: #9ca3af;
   }
 
   /* ===== DARK MODE ===== */
@@ -276,34 +467,43 @@ const { feedUrl = "https://threads-gamma-five.vercel.app/api/public-feed" } = As
     border-bottom-color: #333;
   }
 
-  :global(body.dark-mode) .title {
+  :global(body.dark-mode) .title,
+  :global(body.dark-mode) .subtitle {
     color: #9ca3af;
   }
 
-  :global(body.dark-mode) .subtitle {
-    color: #6b7280;
+  :global(body.dark-mode) .feed-container {
+    background: #1a1a1a;
   }
 
-  :global(body.dark-mode) .life-card :global(.thread-item) {
+  :global(body.dark-mode) .life-card :global(.threadCard) {
+    background: #1a1a1a;
     border-bottom-color: #333;
   }
 
-  :global(body.dark-mode) .life-card :global(.thread-item:hover) {
+  :global(body.dark-mode) .life-card :global(.threadCard:hover) {
     background: #222;
   }
 
   :global(body.dark-mode) .life-card :global(.username),
-  :global(body.dark-mode) .life-card :global(.thread-content) {
+  :global(body.dark-mode) .life-card :global(.threadText) {
     color: #ffffff;
   }
 
   :global(body.dark-mode) .life-card :global(.timestamp),
-  :global(body.dark-mode) .life-card :global(.thread-stats) {
+  :global(body.dark-mode) .life-card :global(.actionCount) {
     color: #9ca3af;
   }
 
-  :global(body.dark-mode) .loading-state {
-    color: #9ca3af;
+  :global(body.dark-mode) .life-card :global(.gridTwoItem),
+  :global(body.dark-mode) .life-card :global(.chainItem) {
+    background-color: #1a1a1a;
+    border-color: #404040;
+  }
+
+  :global(body.dark-mode) .life-card :global(.skeleton) {
+    background: linear-gradient(90deg, #2a2a2a 0%, #1a1a1a 50%, #2a2a2a 100%);
+    background-size: 200% 100%;
   }
 
   :global(body.dark-mode) .spinner {
@@ -311,24 +511,28 @@ const { feedUrl = "https://threads-gamma-five.vercel.app/api/public-feed" } = As
     border-top-color: #667eea;
   }
 
-  /* ===== RESPONSIVE: Mobile ===== */
+  /* ===== RESPONSIVE ===== */
   @media (max-width: 600px) {
     .header {
-      padding: 16px;
-      padding-bottom: 12px;
+      padding: 12px;
     }
 
     .feed-container {
-      padding: 8px;
-    }
-
-    .life-card :global(.thread-item) {
-      padding: 12px 8px;
+      padding: 0;
     }
   }
 </style>
 
 <script>
+  interface FeedMedia {
+    id: string;
+    url: string;
+    type: string;
+    width: number | null;
+    height: number | null;
+    order: number;
+  }
+
   interface FeedThread {
     id: string;
     user_id: string;
@@ -341,14 +545,7 @@ const { feedUrl = "https://threads-gamma-five.vercel.app/api/public-feed" } = As
     avatar_text: string;
     avatar_bg: string;
     verified: boolean;
-    medias: Array<{
-      id: string;
-      url: string;
-      type: string;
-      width: number | null;
-      height: number | null;
-      order: number;
-    }>;
+    medias: FeedMedia[];
   }
 
   function initLifeCard() {
@@ -361,7 +558,6 @@ const { feedUrl = "https://threads-gamma-five.vercel.app/api/public-feed" } = As
     let hasMore = true;
     let currentLimit = 10;
 
-    // Format timestamp
     function formatTime(timestamp: string): string {
       const date = new Date(timestamp);
       const now = new Date();
@@ -375,68 +571,146 @@ const { feedUrl = "https://threads-gamma-five.vercel.app/api/public-feed" } = As
       return date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
     }
 
-    // Render thread item
-    function renderThread(thread: FeedThread): string {
-      const images = thread.medias?.filter(m => m.type === 'image').slice(0, 4) || [];
-      const imageGridClass = images.length === 1 ? 'single' : 'multiple';
+    // Render Image Gallery với 3 modes
+    function renderImageGallery(medias: FeedMedia[]): string {
+      const images = medias.filter(m => m.type === 'image').sort((a, b) => a.order - b.order);
       
-      return `
-        <div class="thread-item" data-thread-id="${thread.id}">
-          <div class="thread-header">
-            <div class="avatar" style="background: ${thread.avatar_bg}">
-              ${thread.avatar_text}
-            </div>
-            <div class="thread-meta">
-              <div>
-                <span class="username">${thread.username}</span>
-                ${thread.verified ? `
-                  <span class="verified-badge">
-                    <svg viewBox="0 0 22 22">
-                      <path d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.75-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.086-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.688-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.634.433 1.218.877 1.688.47.443 1.054.747 1.687.878.633.132 1.29.084 1.897-.136.274.586.705 1.084 1.246 1.439.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816zM9.662 14.85l-3.429-3.428 1.293-1.302 2.072 2.072 4.4-4.794 1.347 1.246z" />
-                    </svg>
-                  </span>
-                ` : ''}
-                <span class="timestamp">${formatTime(thread.created_at)}</span>
-              </div>
+      if (images.length === 0) return '';
+      
+      // CASE 1: Single Image
+      if (images.length === 1) {
+        const img = images[0];
+        const aspectRatio = img.width && img.height ? `${img.width}/${img.height}` : 'auto';
+        
+        return `
+          <div class="gallery layoutSingle">
+            <div class="singleWrapper" style="aspect-ratio: ${aspectRatio}">
+              <div class="skeleton"></div>
+              <img 
+                src="${img.url}" 
+                alt="Thread image" 
+                class="singleImage"
+                loading="lazy"
+                onload="this.classList.add('loaded'); this.previousElementSibling.remove();"
+              />
             </div>
           </div>
-
-          <div class="thread-content">${thread.content}</div>
-
-          ${images.length > 0 ? `
-            <div class="thread-images">
-              <div class="image-grid ${imageGridClass}">
-                ${images.map(img => `
+        `;
+      }
+      
+      // CASE 2: Grid 2 Images
+      if (images.length === 2) {
+        return `
+          <div class="gallery">
+            <div class="gridTwo">
+              ${images.map(img => `
+                <div class="gridTwoItem">
+                  <div class="skeleton"></div>
                   <img 
                     src="${img.url}" 
-                    alt="Thread image" 
-                    class="thread-image"
+                    alt="Image" 
+                    class="gridTwoImage"
                     loading="lazy"
+                    onload="this.classList.add('loaded'); this.previousElementSibling.remove();"
                   />
-                `).join('')}
-              </div>
+                </div>
+              `).join('')}
             </div>
-          ` : ''}
-
-          <div class="thread-stats">
-            <span class="stat-item">
-              <svg viewBox="0 0 24 24" stroke-width="2">
-                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-              </svg>
-              ${thread.likes_count}
-            </span>
-            <span class="stat-item">
-              <svg viewBox="0 0 24 24" stroke-width="2">
-                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
-              </svg>
-              ${thread.comments_count}
-            </span>
+          </div>
+        `;
+      }
+      
+      // CASE 3+: Horizontal Scroll Chain
+      const MAX_VISIBLE = 5;
+      const displayImages = images.slice(0, MAX_VISIBLE);
+      const remainingCount = images.length - MAX_VISIBLE;
+      
+      return `
+        <div class="gallery">
+          <div class="chainWrapper">
+            <div class="chainScroll">
+              ${displayImages.map((img, idx) => {
+                const isLast = idx === MAX_VISIBLE - 1;
+                const showOverlay = isLast && remainingCount > 0;
+                
+                return `
+                  <div class="chainItem">
+                    <div class="skeleton"></div>
+                    <img 
+                      src="${img.url}" 
+                      alt="Image ${idx + 1}" 
+                      class="chainImage"
+                      loading="lazy"
+                      onload="this.classList.add('loaded'); this.previousElementSibling.remove();"
+                    />
+                    ${showOverlay ? `
+                      <div class="overlay">
+                        <span>+${remainingCount}</span>
+                      </div>
+                    ` : ''}
+                  </div>
+                `;
+              }).join('')}
+            </div>
           </div>
         </div>
       `;
     }
 
-    // Fetch threads
+    function renderThread(thread: FeedThread): string {
+      return `
+        <article class="threadCard" data-thread-id="${thread.id}">
+          <div class="threadContainer">
+            <div class="threadAvatar">
+              <div class="avatar" style="background: ${thread.avatar_bg}">
+                ${thread.avatar_text}
+              </div>
+            </div>
+
+            <div class="threadContent">
+              <div class="threadHeader">
+                <div class="threadHeaderLeft">
+                  <span class="username">${thread.username}</span>
+                  ${thread.verified ? `
+                    <div class="verifiedBadge">
+                      <svg viewBox="0 0 22 22">
+                        <path d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.75-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.086-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.688-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.634.433 1.218.877 1.688.47.443 1.054.747 1.687.878.633.132 1.29.084 1.897-.136.274.586.705 1.084 1.246 1.439.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816zM9.662 14.85l-3.429-3.428 1.293-1.302 2.072 2.072 4.4-4.794 1.347 1.246z" />
+                      </svg>
+                    </div>
+                  ` : ''}
+                  <span class="timestamp">${formatTime(thread.created_at)}</span>
+                </div>
+              </div>
+
+              <div class="threadText">${thread.content}</div>
+
+              ${renderImageGallery(thread.medias)}
+
+              <div class="threadActions">
+                <div class="actionButton">
+                  <div class="actionIcon">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                    </svg>
+                  </div>
+                  <span class="actionCount">${thread.likes_count}</span>
+                </div>
+
+                <div class="actionButton">
+                  <div class="actionIcon">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+                    </svg>
+                  </div>
+                  <span class="actionCount">${thread.comments_count}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+      `;
+    }
+
     async function fetchThreads() {
       if (isLoading || !hasMore) return;
       
@@ -449,7 +723,6 @@ const { feedUrl = "https://threads-gamma-five.vercel.app/api/public-feed" } = As
         
         threads = data.threads || [];
         
-        // Clear loading state
         feedContainer.innerHTML = '';
         
         if (threads.length === 0) {
@@ -462,12 +735,10 @@ const { feedUrl = "https://threads-gamma-five.vercel.app/api/public-feed" } = As
           return;
         }
         
-        // Render threads
         threads.forEach(thread => {
           feedContainer.insertAdjacentHTML('beforeend', renderThread(thread));
         });
         
-        // Add load more indicator
         if (threads.length >= currentLimit) {
           feedContainer.insertAdjacentHTML('beforeend', `
             <div class="load-more" id="load-more-trigger">
@@ -478,8 +749,8 @@ const { feedUrl = "https://threads-gamma-five.vercel.app/api/public-feed" } = As
           hasMore = false;
         }
         
-        // Attach click handlers
         attachClickHandlers();
+        setupCarouselDrag();
         
       } catch (error) {
         console.error('Failed to fetch threads:', error);
@@ -493,12 +764,11 @@ const { feedUrl = "https://threads-gamma-five.vercel.app/api/public-feed" } = As
       }
     }
 
-    // Attach click handlers
     function attachClickHandlers() {
-      const threadItems = feedContainer.querySelectorAll('.thread-item');
-      threadItems.forEach(item => {
-        item.addEventListener('click', () => {
-          const threadId = item.getAttribute('data-thread-id');
+      const threadCards = feedContainer.querySelectorAll('.threadCard');
+      threadCards.forEach(card => {
+        card.addEventListener('click', () => {
+          const threadId = card.getAttribute('data-thread-id');
           if (threadId) {
             window.open(`https://threads-gamma-five.vercel.app/thread/${threadId}`, '_blank');
           }
@@ -506,7 +776,45 @@ const { feedUrl = "https://threads-gamma-five.vercel.app/api/public-feed" } = As
       });
     }
 
-    // Infinity scroll observer
+    // Carousel drag logic (simplified)
+    function setupCarouselDrag() {
+      const carousels = feedContainer.querySelectorAll('.chainScroll');
+      
+      carousels.forEach(carousel => {
+        let isDragging = false;
+        let startX = 0;
+        let scrollLeft = 0;
+        
+        carousel.addEventListener('mousedown', (e: Event) => {
+          const event = e as MouseEvent;
+          isDragging = true;
+          carousel.classList.add('isDragging');
+          startX = event.pageX - (carousel as HTMLElement).offsetLeft;
+          scrollLeft = (carousel as HTMLElement).scrollLeft;
+        });
+        
+        carousel.addEventListener('mousemove', (e: Event) => {
+          if (!isDragging) return;
+          e.preventDefault();
+          const event = e as MouseEvent;
+          const x = event.pageX - (carousel as HTMLElement).offsetLeft;
+          const walk = (x - startX) * 2;
+          (carousel as HTMLElement).scrollLeft = scrollLeft - walk;
+        });
+        
+        carousel.addEventListener('mouseup', () => {
+          isDragging = false;
+          carousel.classList.remove('isDragging');
+        });
+        
+        carousel.addEventListener('mouseleave', () => {
+          isDragging = false;
+          carousel.classList.remove('isDragging');
+        });
+      });
+    }
+
+    // Infinity scroll
     let observer: IntersectionObserver | null = null;
     
     function setupInfinityScroll() {
@@ -523,8 +831,8 @@ const { feedUrl = "https://threads-gamma-five.vercel.app/api/public-feed" } = As
         },
         {
           root: feedContainer,
-          rootMargin: '50px',
-          threshold: 0.1
+          rootMargin: '0px',
+          threshold: 1
         }
       );
       
@@ -534,15 +842,9 @@ const { feedUrl = "https://threads-gamma-five.vercel.app/api/public-feed" } = As
       }
     }
 
-    // Initial fetch
     fetchThreads().then(() => {
       setupInfinityScroll();
     });
-    
-    // Re-observe after each fetch
-    feedContainer.addEventListener('DOMSubtreeModified', () => {
-      setupInfinityScroll();
-    }, { once: true });
   }
 
   if (document.readyState === 'loading') {
