@@ -9,16 +9,70 @@ const { feedUrl = "/api/life-feed" } = Astro.props;
 <div class="card life-card" id="life-card">
   <!-- Header -->
   <div class="header">
-    <h2 class="title">RECENT UPDATES</h2>
-    <p class="subtitle">Latest from my social feed</p>
+    <div class="header-left">
+      <h2 class="title">RECENT UPDATES</h2>
+      <p class="subtitle">Latest from my social feed</p>
+    </div>
+    
+    <!-- Nút chuyển đến mạng xã hội -->
+    <a href="https://threads-gamma-five.vercel.app" target="_blank" rel="noopener" class="social-link" aria-label="Xem thêm">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M7 17L17 7M17 7H7M17 7V17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </a>
   </div>
 
   <!-- Feed Container -->
   <div class="feed-container" id="life-feed" data-feed-url={feedUrl}>
-    <!-- Loading State -->
-    <div class="loading-state">
-      <div class="spinner"></div>
-      <span class="loading-text">Loading updates...</span>
+    <!-- Loading State - Skeleton 3 bài viết -->
+    <div class="skeleton-container">
+      <div class="skeleton-thread">
+        <div class="skeleton-avatar"></div>
+        <div class="skeleton-content">
+          <div class="skeleton-header">
+            <div class="skeleton-name"></div>
+            <div class="skeleton-time"></div>
+          </div>
+          <div class="skeleton-text"></div>
+          <div class="skeleton-text short"></div>
+          <div class="skeleton-image"></div>
+          <div class="skeleton-actions">
+            <div class="skeleton-action"></div>
+            <div class="skeleton-action"></div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="skeleton-thread">
+        <div class="skeleton-avatar"></div>
+        <div class="skeleton-content">
+          <div class="skeleton-header">
+            <div class="skeleton-name"></div>
+            <div class="skeleton-time"></div>
+          </div>
+          <div class="skeleton-text"></div>
+          <div class="skeleton-text short"></div>
+          <div class="skeleton-actions">
+            <div class="skeleton-action"></div>
+            <div class="skeleton-action"></div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="skeleton-thread">
+        <div class="skeleton-avatar"></div>
+        <div class="skeleton-content">
+          <div class="skeleton-header">
+            <div class="skeleton-name"></div>
+            <div class="skeleton-time"></div>
+          </div>
+          <div class="skeleton-text"></div>
+          <div class="skeleton-actions">
+            <div class="skeleton-action"></div>
+            <div class="skeleton-action"></div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -56,6 +110,13 @@ const { feedUrl = "/api/life-feed" } = Astro.props;
     padding: clamp(16px, 4cqi, 20px);
     padding-bottom: clamp(12px, 3cqi, 16px);
     border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .header-left {
+    flex: 1;
   }
 
   .title {
@@ -71,6 +132,35 @@ const { feedUrl = "/api/life-feed" } = Astro.props;
     font-size: clamp(10px, 2.5cqi, 12px);
     color: #6b7280;
     margin: 0;
+  }
+
+  /* Nút Social Link */
+  .social-link {
+    width: clamp(32px, 8cqi, 36px);
+    height: clamp(32px, 8cqi, 36px);
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+  }
+
+  .social-link:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  }
+
+  .social-link:active {
+    transform: scale(0.95);
+  }
+
+  .social-link svg {
+    width: clamp(16px, 4cqi, 18px);
+    height: clamp(16px, 4cqi, 18px);
   }
 
   /* ===== FEED CONTAINER ===== */
@@ -131,13 +221,107 @@ const { feedUrl = "/api/life-feed" } = Astro.props;
     font-weight: 500;
   }
 
-  /* ===== THREAD CARD - GIỮ NGUYÊN CẤU TRÚC GỐC ===== */
+  /* ===== SKELETON LOADING ===== */
+  .skeleton-container {
+    padding: 0;
+  }
+
+  .skeleton-thread {
+    display: flex;
+    gap: clamp(8px, 2cqi, 12px);
+    padding: clamp(12px, 3cqi, 16px);
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .skeleton-avatar {
+    width: clamp(32px, 8cqi, 40px);
+    height: clamp(32px, 8cqi, 40px);
+    border-radius: 50%;
+    background: linear-gradient(90deg, #f0f0f0 0%, #e0e0e0 50%, #f0f0f0 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+
+  .skeleton-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .skeleton-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .skeleton-name {
+    width: 80px;
+    height: 14px;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #f0f0f0 0%, #e0e0e0 50%, #f0f0f0 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+  }
+
+  .skeleton-time {
+    width: 40px;
+    height: 12px;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #f0f0f0 0%, #e0e0e0 50%, #f0f0f0 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+  }
+
+  .skeleton-text {
+    width: 100%;
+    height: 14px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+    background: linear-gradient(90deg, #f0f0f0 0%, #e0e0e0 50%, #f0f0f0 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+  }
+
+  .skeleton-text.short {
+    width: 60%;
+  }
+
+  .skeleton-image {
+    width: 100%;
+    height: clamp(120px, 30cqi, 160px);
+    border-radius: clamp(8px, 2cqi, 12px);
+    margin-bottom: 10px;
+    background: linear-gradient(90deg, #f0f0f0 0%, #e0e0e0 50%, #f0f0f0 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+  }
+
+  .skeleton-actions {
+    display: flex;
+    gap: 16px;
+  }
+
+  .skeleton-action {
+    width: 50px;
+    height: 20px;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #f0f0f0 0%, #e0e0e0 50%, #f0f0f0 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  /* ===== THREAD CARD - ĐÃ XÓA cursor: pointer ===== */
   .life-card :global(.threadCard) {
     width: 100%;
     padding: clamp(12px, 3cqi, 16px);
     border-bottom: 1px solid #f0f0f0;
     background: #ffffff;
-    cursor: pointer;
   }
 
   .life-card :global(.threadCard:hover) {
@@ -303,7 +487,7 @@ const { feedUrl = "/api/life-feed" } = Astro.props;
 
   /* CASE 3+: Horizontal Scroll Chain */
   .life-card :global(.chainWrapper) {
-  /* Tràn ra ngoài để sát mép card */
+  /* Trần ra ngoài để sát mép card */
   margin-left: calc(
     -1 * (
       clamp(32px, 8cqi, 40px)    /* avatar width */
@@ -388,11 +572,6 @@ const { feedUrl = "/api/life-feed" } = Astro.props;
     background-size: 200% 100%;
     animation: shimmer 1.5s ease-in-out infinite;
     z-index: 1;
-  }
-
-  @keyframes shimmer {
-    0% { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
   }
 
   .life-card :global(.overlay) {
@@ -509,6 +688,26 @@ const { feedUrl = "/api/life-feed" } = Astro.props;
   :global(body.dark-mode) .spinner {
     border-color: #333;
     border-top-color: #667eea;
+  }
+
+  /* Dark mode skeleton */
+  :global(body.dark-mode) .skeleton-thread {
+    border-bottom-color: #333;
+  }
+
+  :global(body.dark-mode) .skeleton-avatar,
+  :global(body.dark-mode) .skeleton-name,
+  :global(body.dark-mode) .skeleton-time,
+  :global(body.dark-mode) .skeleton-text,
+  :global(body.dark-mode) .skeleton-image,
+  :global(body.dark-mode) .skeleton-action {
+    background: linear-gradient(90deg, #2a2a2a 0%, #3a3a3a 50%, #2a2a2a 100%);
+    background-size: 200% 100%;
+  }
+
+  /* Dark mode social link */
+  :global(body.dark-mode) .social-link {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   }
 
   /* ===== RESPONSIVE ===== */
@@ -725,8 +924,8 @@ const { feedUrl = "/api/life-feed" } = Astro.props;
       try {
         const lastThread = threads[threads.length - 1];
         const cursorParams = lastThread 
-          ? `&cursor_time=${lastThread.created_at}&cursor_id=${lastThread.id}` 
-          : '';
+  ? `&cursor_time=${encodeURIComponent(lastThread.created_at)}&cursor_id=${lastThread.id}` 
+  : '';
         const url = `${feedUrl}?limit=10${cursorParams}`;
         
         const res = await fetch(url);
@@ -763,10 +962,56 @@ const { feedUrl = "/api/life-feed" } = Astro.props;
           // Server trả về ít hơn 10 bài => hết dữ liệu
           hasMore = false;
         } else {
-          // Còn dữ liệu => thêm loading trigger mới
+          // Còn dữ liệu => thêm loading trigger mới với 3 skeleton
           feedContainer.insertAdjacentHTML('beforeend', `
             <div class="load-more" id="load-more-trigger">
-              <div class="spinner"></div>
+              <div class="skeleton-thread">
+                <div class="skeleton-avatar"></div>
+                <div class="skeleton-content">
+                  <div class="skeleton-header">
+                    <div class="skeleton-name"></div>
+                    <div class="skeleton-time"></div>
+                  </div>
+                  <div class="skeleton-text"></div>
+                  <div class="skeleton-text short"></div>
+                  <div class="skeleton-image"></div>
+                  <div class="skeleton-actions">
+                    <div class="skeleton-action"></div>
+                    <div class="skeleton-action"></div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="skeleton-thread">
+                <div class="skeleton-avatar"></div>
+                <div class="skeleton-content">
+                  <div class="skeleton-header">
+                    <div class="skeleton-name"></div>
+                    <div class="skeleton-time"></div>
+                  </div>
+                  <div class="skeleton-text"></div>
+                  <div class="skeleton-text short"></div>
+                  <div class="skeleton-actions">
+                    <div class="skeleton-action"></div>
+                    <div class="skeleton-action"></div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="skeleton-thread">
+                <div class="skeleton-avatar"></div>
+                <div class="skeleton-content">
+                  <div class="skeleton-header">
+                    <div class="skeleton-name"></div>
+                    <div class="skeleton-time"></div>
+                  </div>
+                  <div class="skeleton-text"></div>
+                  <div class="skeleton-actions">
+                    <div class="skeleton-action"></div>
+                    <div class="skeleton-action"></div>
+                  </div>
+                </div>
+              </div>
             </div>
           `);
           
@@ -774,7 +1019,6 @@ const { feedUrl = "/api/life-feed" } = Astro.props;
           setupInfinityScroll();
         }
         
-        attachClickHandlers();
         setupCarouselDrag();
         
       } catch (error) {
@@ -788,18 +1032,6 @@ const { feedUrl = "/api/life-feed" } = Astro.props;
       } finally {
         isLoading = false;
       }
-    }
-
-    function attachClickHandlers() {
-      const threadCards = feedContainer.querySelectorAll('.threadCard');
-      threadCards.forEach(card => {
-        card.addEventListener('click', () => {
-          const threadId = card.getAttribute('data-thread-id');
-          if (threadId) {
-            window.open(`https://threads-gamma-five.vercel.app/thread/${threadId}`, '_blank');
-          }
-        });
-      });
     }
 
     function setupCarouselDrag() {
