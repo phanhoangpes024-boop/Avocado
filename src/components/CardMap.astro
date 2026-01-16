@@ -200,40 +200,52 @@ const mapId = `map-${Math.random().toString(36).substr(2, 9)}`;
   import L from 'leaflet';
   import 'leaflet/dist/leaflet.css';
 
+  // ✅ THÊM INTERSECTION OBSERVER
   function initAllMaps() {
     const mapContainers = document.querySelectorAll('.map-container');
     
-    mapContainers.forEach((mapEl) => {
-      if ((mapEl as any).dataset.initialized === 'true') return;
-      
-      const lat = parseFloat((mapEl as HTMLElement).dataset.lat || '0');
-      const lng = parseFloat((mapEl as HTMLElement).dataset.lng || '0');
-      const zoom = parseInt((mapEl as HTMLElement).dataset.zoom || '15');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const mapEl = entry.target as HTMLElement;
+          
+          // ← CHỈ INIT MAP KHI NHÌN THẤY
+          if (mapEl.dataset.initialized === 'true') return;
+          
+          const lat = parseFloat(mapEl.dataset.lat || '0');
+          const lng = parseFloat(mapEl.dataset.lng || '0');
+          const zoom = parseInt(mapEl.dataset.zoom || '15');
 
-      const map = L.map(mapEl as HTMLElement, {
-        center: [lat, lng],
-        zoom: zoom,
-        zoomControl: false,
-        dragging: true,
-        scrollWheelZoom: false,
-        doubleClickZoom: true,
-        touchZoom: true
+          const map = L.map(mapEl, {
+            center: [lat, lng],
+            zoom: zoom,
+            zoomControl: false,
+            dragging: true,
+            scrollWheelZoom: false,
+            doubleClickZoom: true,
+            touchZoom: true
+          });
+
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '',
+            maxZoom: 19,
+            crossOrigin: true
+          }).addTo(map);
+
+          (mapEl as any)._leafletMap = map;
+          mapEl.dataset.initialized = 'true';
+
+          setTimeout(() => map.invalidateSize(), 100);
+          
+          // ← NGỪNG OBSERVE SAU KHI INIT
+          observer.unobserve(mapEl);
+        }
       });
+    }, { rootMargin: '100px' }); // ← LOAD TRƯỚC 100px
+    
+    mapContainers.forEach(mapEl => observer.observe(mapEl));
 
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '',
-        maxZoom: 19,
-        crossOrigin: true
-      }).addTo(map);
-
-      (mapEl as any)._leafletMap = map;
-      (mapEl as any).dataset.initialized = 'true';
-
-      setTimeout(() => map.invalidateSize(), 100);
-      setTimeout(() => map.invalidateSize(), 500);
-    });
-
-    // Xử lý nút zoom
+    // Giữ nguyên phần zoom buttons
     document.querySelectorAll('.zoom-in').forEach((btn) => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();

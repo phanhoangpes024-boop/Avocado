@@ -222,18 +222,18 @@ const { feedUrl = "/api/life-feed" } = Astro.props;
   }
 
   /* ===== SKELETON LOADING ===== */
-  .skeleton-container {
+  .life-card :global(.skeleton-container) {
     padding: 0;
   }
 
-  .skeleton-thread {
+  .life-card :global(.skeleton-thread) {
     display: flex;
     gap: clamp(8px, 2cqi, 12px);
     padding: clamp(12px, 3cqi, 16px);
     border-bottom: 1px solid #f0f0f0;
   }
 
-  .skeleton-avatar {
+  .life-card :global(.skeleton-avatar) {
     width: clamp(32px, 8cqi, 40px);
     height: clamp(32px, 8cqi, 40px);
     border-radius: 50%;
@@ -243,19 +243,19 @@ const { feedUrl = "/api/life-feed" } = Astro.props;
     flex-shrink: 0;
   }
 
-  .skeleton-content {
+  .life-card :global(.skeleton-content) {
     flex: 1;
     min-width: 0;
   }
 
-  .skeleton-header {
+  .life-card :global(.skeleton-header) {
     display: flex;
     align-items: center;
     gap: 8px;
     margin-bottom: 8px;
   }
 
-  .skeleton-name {
+  .life-card :global(.skeleton-name) {
     width: 80px;
     height: 14px;
     border-radius: 4px;
@@ -264,7 +264,7 @@ const { feedUrl = "/api/life-feed" } = Astro.props;
     animation: shimmer 1.5s ease-in-out infinite;
   }
 
-  .skeleton-time {
+  .life-card :global(.skeleton-time) {
     width: 40px;
     height: 12px;
     border-radius: 4px;
@@ -273,7 +273,7 @@ const { feedUrl = "/api/life-feed" } = Astro.props;
     animation: shimmer 1.5s ease-in-out infinite;
   }
 
-  .skeleton-text {
+  .life-card :global(.skeleton-text) {
     width: 100%;
     height: 14px;
     border-radius: 4px;
@@ -283,11 +283,11 @@ const { feedUrl = "/api/life-feed" } = Astro.props;
     animation: shimmer 1.5s ease-in-out infinite;
   }
 
-  .skeleton-text.short {
+  .life-card :global(.skeleton-text.short) {
     width: 60%;
   }
 
-  .skeleton-image {
+  .life-card :global(.skeleton-image) {
     width: 100%;
     height: clamp(120px, 30cqi, 160px);
     border-radius: clamp(8px, 2cqi, 12px);
@@ -297,12 +297,12 @@ const { feedUrl = "/api/life-feed" } = Astro.props;
     animation: shimmer 1.5s ease-in-out infinite;
   }
 
-  .skeleton-actions {
+  .life-card :global(.skeleton-actions) {
     display: flex;
     gap: 16px;
   }
 
-  .skeleton-action {
+  .life-card :global(.skeleton-action) {
     width: 50px;
     height: 20px;
     border-radius: 4px;
@@ -691,16 +691,17 @@ const { feedUrl = "/api/life-feed" } = Astro.props;
   }
 
   /* Dark mode skeleton */
-  :global(body.dark-mode) .skeleton-thread {
+  /* Dark mode skeleton */
+  :global(body.dark-mode) .life-card :global(.skeleton-thread) {
     border-bottom-color: #333;
   }
 
-  :global(body.dark-mode) .skeleton-avatar,
-  :global(body.dark-mode) .skeleton-name,
-  :global(body.dark-mode) .skeleton-time,
-  :global(body.dark-mode) .skeleton-text,
-  :global(body.dark-mode) .skeleton-image,
-  :global(body.dark-mode) .skeleton-action {
+  :global(body.dark-mode) .life-card :global(.skeleton-avatar),
+  :global(body.dark-mode) .life-card :global(.skeleton-name),
+  :global(body.dark-mode) .life-card :global(.skeleton-time),
+  :global(body.dark-mode) .life-card :global(.skeleton-text),
+  :global(body.dark-mode) .life-card :global(.skeleton-image),
+  :global(body.dark-mode) .life-card :global(.skeleton-action) {
     background: linear-gradient(90deg, #2a2a2a 0%, #3a3a3a 50%, #2a2a2a 100%);
     background-size: 200% 100%;
   }
@@ -755,7 +756,19 @@ const { feedUrl = "/api/life-feed" } = Astro.props;
     let threads: FeedThread[] = [];
     let isLoading = false;
     let hasMore = true;
-
+  const cardObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting && threads.length === 0) {
+        fetchThreads(); // ← CHỈ FETCH KHI CARD HIỂN THỊ
+        cardObserver.disconnect(); // ← NGỪNG OBSERVE SAU LẦN ĐẦU
+      }
+    });
+  }, { rootMargin: '200px' }); // ← LOAD TRƯỚC 200px
+  
+  const lifeCard = document.querySelector('.life-card');
+  if (lifeCard) {
+    cardObserver.observe(lifeCard);
+  }
     function formatTime(timestamp: string): string {
       const date = new Date(timestamp);
       const now = new Date();
@@ -917,10 +930,7 @@ const { feedUrl = "/api/life-feed" } = Astro.props;
       if (isLoading || !hasMore) return;
       
       isLoading = true;
-      
-      // ✅ SỬA: Xóa loading trigger cũ ngay khi bắt đầu fetch
-      removeLoadingTrigger();
-      
+            
       try {
         const lastThread = threads[threads.length - 1];
         const cursorParams = lastThread 
@@ -930,7 +940,7 @@ const { feedUrl = "/api/life-feed" } = Astro.props;
         
         const res = await fetch(url);
         const data = await res.json();
-        
+        removeLoadingTrigger();
         const newThreads = data.threads || [];
         
         // ✅ SỬA: Xử lý lần load đầu tiên
@@ -1107,9 +1117,21 @@ const { feedUrl = "/api/life-feed" } = Astro.props;
     fetchThreads();
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initLifeCard);
-  } else {
-    initLifeCard();
-  }
+  // Đợi trang load xong + thêm delay
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      const card = document.getElementById('life-card');
+      if (!card) return;
+      
+      // Chỉ fetch khi card xuất hiện trên màn hình
+      const observer = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting) {
+          initLifeCard();
+          observer.disconnect();
+        }
+      }, { rootMargin: '100px' });
+      
+      observer.observe(card);
+    }, 300);
+  });
 </script>
