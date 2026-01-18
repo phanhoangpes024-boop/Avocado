@@ -16,7 +16,7 @@ export const gridItems: GridItem[] = [
     bio: "Hello, tôi là Hector! Tôi có thể xây dựng và vận hành một sản phẩm web từ A đến Z (Code - Deploy - Operate). Sở trường của tôi là giải quyết trọn vẹn các vấn đề kỹ thuật để sản phẩm chạy mượt mà nhất.", 
     buttonText: "" 
   },
-  
+
   // Small cards (1x1) - Hàng 1
   { 
     id: "spotify", 
@@ -100,8 +100,20 @@ export const gridItems: GridItem[] = [
     colSpan: 2,
     rowSpan: 2,
     feedUrl: "https://threads-gamma-five.vercel.app/api/public-feed"
-  }
-  
+  },
+
+  {
+  id: "tool",
+  type: "tool",
+  col: 3,
+  row: 3,
+  colSpan: 1,
+  rowSpan: 1,
+  lottieFile: "/gear.lottie",
+  buttonText: "Xem Tools",
+  toolLink: "/tool"
+}
+
   
 ];
 

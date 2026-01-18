@@ -7,20 +7,38 @@ const { feedUrl = "/api/life-feed" } = Astro.props;
 ---
 
 <div class="card life-card" id="life-card">
-  <!-- Header -->
-  <div class="header">
-    <div class="header-left">
-      <h2 class="title">RECENT UPDATES</h2>
-      <p class="subtitle">Latest from my social feed</p>
+  <!-- Life System Header -->
+<div class="life-header">
+  <div class="life-header-left">
+    <div class="life-status">
+      <span class="life-dot"></span>
+      <span>ACTIVE NOW</span>
     </div>
-    
-    <!-- Nút chuyển đến mạng xã hội -->
-    <a href="https://threads-gamma-five.vercel.app" target="_blank" rel="noopener" class="social-link" aria-label="Xem thêm">
-      <svg viewBox="0 0 24 24" fill="none">
-        <path d="M7 17L17 7M17 7H7M17 7V17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-    </a>
+
+    <h2 class="life-title">
+      MẠNG XÃ HỘI HECTOR
+    </h2>
+
+    <p class="life-subtitle">
+      Phiên bản mạng xã hôi dựa trên Threads do tôi tự phát triển
+    </p>
   </div>
+
+  <a
+  href="https://threads-gamma-five.vercel.app"
+  target="_blank"
+  rel="noopener"
+  aria-label="TEST NOW"
+  class="button-wrapper"
+>
+  <button class="smooth-button">
+    <span class="button-text">TEST NOW</span>
+    <span class="arrow-icon">→</span>
+  </button>
+</a>
+
+</div>
+
 
   <!-- Feed Container -->
   <div class="feed-container" id="life-feed" data-feed-url={feedUrl}>
@@ -636,6 +654,142 @@ const { feedUrl = "/api/life-feed" } = Astro.props;
     padding: 16px;
     text-align: center;
   }
+/* ===== LIFE SYSTEM HEADER ===== */
+.life-header {
+  flex-shrink: 0;
+  padding: 18px 20px 16px;
+  border-bottom: 1px solid #eef0f3;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.life-header-left {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Status */
+.life-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #10b981;
+  letter-spacing: 0.08em;
+  margin-bottom: 6px;
+}
+
+.life-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+}
+
+/* Title */
+.life-title {
+  margin: 0 0 4px 0;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #111827;
+}
+
+/* Subtitle */
+.life-subtitle {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #6b7280;
+  max-width: 520px;
+}
+
+/* Action */
+.life-action {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #eef2ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: #3730a3;
+  text-decoration: none;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.life-action:hover {
+  background: #e0e7ff;
+  transform: translateY(-1px);
+}
+
+/* ===== MINIMAL SMOOTH BUTTON ===== */
+.button-wrapper {
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.smooth-button {
+  border: none;
+  background: #e5e7eb; /* gray-200 – xám đậm hơn */
+  color: #111827;
+  padding: 8px 18px;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 10px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  transition: background-color 0.2s ease,
+              color 0.2s ease,
+              transform 0.15s ease;
+}
+
+.smooth-button .arrow-icon {
+  margin-left: 6px;
+  opacity: 0.6;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+/* Hover: nền đen – chữ trắng */
+.smooth-button:hover {
+  background: #111827; /* gần đen, không gắt */
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.smooth-button:hover .arrow-icon {
+  opacity: 1;
+  transform: translateX(3px);
+}
+
+.smooth-button:active {
+  transform: translateY(0);
+}
+
+/* Dark mode */
+:global(body.dark-mode) .life-header {
+  border-bottom-color: #333;
+}
+
+:global(body.dark-mode) .life-title {
+  color: #ffffff;
+}
+
+:global(body.dark-mode) .life-subtitle {
+  color: #9ca3af;
+}
+
+:global(body.dark-mode) .life-action {
+  background: #1f2937;
+  color: #c7d2fe;
+}
 
   /* ===== DARK MODE ===== */
   :global(body.dark-mode) .life-card {

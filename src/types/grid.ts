@@ -1,4 +1,4 @@
-﻿export type CardType = "intro" | "blog" | "spotify" | "twitter" | "map" | "project" | "darkmode" | "newsletter" | "partners" | "tech"| "life";
+﻿export type CardType = "intro" | "blog" | "spotify" | "twitter" | "map" | "project" | "darkmode" | "newsletter" | "partners" | "tech"| "life" | "tool"| "mock";
 export type ProjectTheme = "pink" | "yellow" | "mint";
 
 export interface BaseGridItem {
@@ -87,6 +87,20 @@ export interface LifeCardData extends BaseGridItem {
   feedUrl?: string;
 }
 
+export interface ToolCardData extends BaseGridItem {
+  type: "tool";
+  lottieFile?: string;
+  buttonText?: string;
+  toolLink?: string;
+}
+
+export interface MockCardData extends BaseGridItem {
+  type: "mock";
+  title?: string;
+  emoji?: string;
+  description?: string;
+}
+
 export type GridItem =
   | IntroCardData
   | BlogCardData
@@ -98,4 +112,6 @@ export type GridItem =
   | NewsletterCardData
   | PartnersCardData
   | TechCardData
-  | LifeCardData;  // ← THÊM DÒNG NÀY
+  | LifeCardData
+  | ToolCardData
+  | MockCardData;
