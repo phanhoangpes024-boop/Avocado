@@ -1,13 +1,13 @@
-﻿export type CardType = "intro" | "blog" | "spotify" | "twitter" | "map" | "project" | "darkmode" | "newsletter" | "partners" | "tech"| "life" | "tool"| "mock";
+﻿export type CardType = "intro" | "blog" | "spotify" | "twitter" | "map" | "project" | "darkmode" | "newsletter" | "partners" | "tech"| "life" | "tool"| "mock" | "minitool";
 export type ProjectTheme = "pink" | "yellow" | "mint";
 
 export interface BaseGridItem {
   id: string;
   type: CardType;
-  col: number;       // Cột bắt đầu (1-4)
-  row: number;       // Hàng bắt đầu
-  colSpan: number;   // Số cột chiếm (1, 2, 3...)
-  rowSpan: number;   // Số hàng chiếm (1, 2, 3...)
+  col: number;
+  row: number;
+  colSpan: number;
+  rowSpan: number;
 }
 
 export interface IntroCardData extends BaseGridItem {
@@ -41,9 +41,9 @@ export interface MapCardData extends BaseGridItem {
   type: "map";
   emoji: string;
   location?: string;
-  lat: number;       // Vĩ độ (latitude)
-  lng: number;       // Kinh độ (longitude)
-  zoom?: number;     // Mức zoom (tùy chọn, mặc định 15)
+  lat: number;
+  lng: number;
+  zoom?: number;
 }
 
 export interface ProjectCardData extends BaseGridItem {
@@ -101,6 +101,13 @@ export interface MockCardData extends BaseGridItem {
   description?: string;
 }
 
+// ✅ THÊM MỚI: Interface cho MiniTool
+export interface MiniToolCardData extends BaseGridItem {
+  type: "minitool";
+  name: string;
+  lottieFile: string;
+}
+
 export type GridItem =
   | IntroCardData
   | BlogCardData
@@ -114,4 +121,5 @@ export type GridItem =
   | TechCardData
   | LifeCardData
   | ToolCardData
-  | MockCardData;
+  | MockCardData
+  | MiniToolCardData;  // ✅ THÊM MỚI

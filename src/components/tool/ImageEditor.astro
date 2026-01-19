@@ -1,0 +1,887 @@
+---
+// Popup chỉnh ảnh
+---
+
+<div class="tool-popup" id="image-editor-popup">
+  <div class="popup-content">
+    <!-- Header -->
+    <div class="popup-header">
+      <h2 class="popup-title">🖼️ Chỉnh ảnh</h2>
+      <button class="close-popup-btn" data-popup="image-editor">
+        <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="popup-body">
+      <!-- Upload Area - Hiển thị ban đầu -->
+      <div class="upload-area" id="upload-area">
+        <input type="file" id="image-upload" accept="image/*" multiple hidden />
+        <div class="upload-placeholder">
+          <svg width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+          </svg>
+          <p class="upload-title">Kéo thả ảnh vào đây hoặc click để chọn</p>
+          <p class="upload-subtitle">Hỗ trợ: JPG, PNG, WebP, GIF... (Có thể chọn nhiều ảnh)</p>
+        </div>
+      </div>
+
+      <!-- Thumbnails - Hiển thị sau khi upload -->
+      <div class="thumbnails-container" id="thumbnails-container" style="display: none;">
+        <div class="thumbnails-list" id="thumbnails-list"></div>
+      </div>
+
+      <!-- Convert Options -->
+      <div class="convert-options">
+        <div class="options-row">
+          <div class="form-group half">
+            <label for="output-format">
+              <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+              Định dạng đầu ra:
+            </label>
+            <select id="output-format">
+              <option value="original">Giữ nguyên</option>
+              <option value="webp">WebP</option>
+              <option value="png">PNG</option>
+              <option value="jpg">JPG</option>
+              <option value="jpeg">JPEG</option>
+            </select>
+          </div>
+
+          <div class="form-group half">
+            <label for="resize-option">
+              <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
+              </svg>
+              Kích thước:
+            </label>
+            <select id="resize-option">
+              <option value="keep">Giữ nguyên</option>
+              <option value="custom">Tùy chỉnh</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Custom Size Options -->
+        <div class="custom-size-options" id="custom-size-options" style="display: none;">
+          <div class="options-row">
+            <div class="form-group half">
+              <label for="custom-width">Chiều rộng (px):</label>
+              <input type="number" id="custom-width" placeholder="Auto" min="1" />
+            </div>
+
+            <div class="form-group half">
+              <label for="custom-height">Chiều cao (px):</label>
+              <input type="number" id="custom-height" placeholder="Auto" min="1" />
+            </div>
+          </div>
+
+          <div class="maintain-ratio">
+            <label>
+              <input type="checkbox" id="maintain-ratio" checked />
+              <span>Giữ tỷ lệ khung hình</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Quality Slider -->
+        <div class="form-group" id="quality-group" style="display: none;">
+          <label for="image-quality">
+            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+            </svg>
+            Chất lượng: <span id="quality-value">90%</span>
+          </label>
+          <div class="slider-group">
+            <input type="range" id="image-quality" min="1" max="100" value="90" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Progress Bar -->
+      <div class="progress-container" id="progress-container" style="display: none;">
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <p class="progress-text" id="progress-text">Đang xử lý: 0/0</p>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="action-buttons">
+        <button class="btn btn-secondary" id="clear-btn" disabled>
+          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+          </svg>
+          <span>Xóa tất cả</span>
+        </button>
+
+        <button class="btn btn-primary" id="process-btn" disabled>
+          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+          </svg>
+          <span>Xử lý và tải xuống</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* === POPUP === */
+  .tool-popup {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 20px;
+  }
+
+  .tool-popup.active {
+    display: flex;
+  }
+
+  .popup-content {
+    background: white;
+    border-radius: 24px;
+    width: 100%;
+    max-width: 700px;
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  }
+
+  /* === HEADER === */
+  .popup-header {
+    padding: 24px;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+
+  .popup-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0;
+  }
+
+  .close-popup-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #f3f4f6;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .close-popup-btn:hover {
+    background: #e5e7eb;
+    transform: rotate(90deg);
+  }
+
+  /* === BODY === */
+  .popup-body {
+    padding: 24px;
+    overflow-y: auto;
+    flex: 1;
+  }
+
+  /* === UPLOAD AREA === */
+  .upload-area {
+    padding: 40px 24px;
+    border: 3px dashed #d1d5db;
+    border-radius: 16px;
+    background: #f9fafb;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 12px;
+  }
+
+  .upload-area:hover {
+    border-color: #3b82f6;
+    background: #eff6ff;
+  }
+
+  .upload-area.dragover {
+    border-color: #3b82f6;
+    background: #dbeafe;
+  }
+
+  .upload-placeholder {
+    text-align: center;
+    pointer-events: none;
+  }
+
+  .upload-placeholder svg {
+    color: #9ca3af;
+    margin: 0 auto 16px;
+  }
+
+  .upload-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #374151;
+    margin: 0 0 8px;
+  }
+
+  .upload-subtitle {
+    font-size: 13px;
+    color: #6b7280;
+    margin: 0;
+  }
+
+  /* === THUMBNAILS === */
+  .thumbnails-container {
+    padding: 12px;
+    background: #f9fafb;
+    border-radius: 16px;
+    margin-bottom: 12px;
+  }
+
+  .thumbnails-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* ✅ THÊM :global() CHO CÁC CLASS ĐƯỢC TẠO BỞI JAVASCRIPT */
+  :global(.thumb-item) {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: white;
+    border: 2px solid #e5e7eb;
+    flex-shrink: 0;
+  }
+
+  :global(.thumb-item img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  :global(.thumb-remove) {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.7);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  :global(.thumb-item:hover .thumb-remove) {
+    opacity: 1;
+  }
+
+  :global(.thumb-remove:hover) {
+    background: rgba(239, 68, 68, 0.9);
+  }
+
+  :global(.thumb-remove svg) {
+    width: 14px;
+    height: 14px;
+    stroke: white;
+  }
+
+  :global(.add-more-btn) {
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    border: 2px dashed #d1d5db;
+    background: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+
+  :global(.add-more-btn:hover) {
+    border-color: #3b82f6;
+    background: #eff6ff;
+  }
+
+  :global(.add-more-btn svg) {
+    width: 32px;
+    height: 32px;
+    color: #9ca3af;
+  }
+
+  /* === OPTIONS === */
+  .convert-options {
+    background: #f9fafb;
+    padding: 10px;
+    border-radius: 16px;
+    margin-bottom: 10px;
+  }
+
+  .options-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 8px;
+  }
+
+  .options-row:last-child {
+    margin-bottom: 0;
+  }
+
+  .form-group {
+    margin: 0;
+  }
+
+  .form-group.half {
+    flex: 1;
+  }
+
+  .form-group label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 4px;
+  }
+
+  .form-group label svg {
+    width: 18px;
+    height: 18px;
+    color: #6b7280;
+  }
+
+  .form-group select,
+  .form-group input[type="number"] {
+    width: 100%;
+    padding: 10px 14px;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: inherit;
+    background: white;
+    transition: border-color 0.2s;
+  }
+
+  .form-group select:focus,
+  .form-group input[type="number"]:focus {
+    outline: none;
+    border-color: #3b82f6;
+  }
+
+  .custom-size-options {
+    padding-top: 8px;
+    border-top: 1px solid #e5e7eb;
+  }
+
+  .maintain-ratio {
+    margin-top: 8px;
+  }
+
+  .maintain-ratio label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-weight: normal;
+  }
+
+  .maintain-ratio input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+  }
+
+  .maintain-ratio span {
+    font-size: 13px;
+    color: #6b7280;
+  }
+
+  .slider-group {
+    margin-top: 4px;
+  }
+
+  .slider-group input[type="range"] {
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    background: #e5e7eb;
+    outline: none;
+    -webkit-appearance: none;
+  }
+
+  .slider-group input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #3b82f6;
+    cursor: pointer;
+  }
+
+  /* === PROGRESS === */
+  .progress-container {
+    margin-bottom: 10px;
+  }
+
+  .progress-bar {
+    width: 100%;
+    height: 8px;
+    background: #e5e7eb;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+    width: 0%;
+    transition: width 0.3s ease;
+  }
+
+  .progress-text {
+    font-size: 13px;
+    color: #6b7280;
+    text-align: center;
+    margin: 0;
+  }
+
+  /* === BUTTONS === */
+  .action-buttons {
+    display: flex;
+    gap: 12px;
+  }
+
+  .btn {
+    flex: 1;
+    padding: 14px 24px;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s;
+  }
+
+  .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .btn-primary {
+    background: #3b82f6;
+    color: white;
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    background: #2563eb;
+    transform: translateY(-2px);
+  }
+
+  .btn-secondary {
+    background: #ef4444;
+    color: white;
+  }
+
+  .btn-secondary:hover:not(:disabled) {
+    background: #dc2626;
+    transform: translateY(-2px);
+  }
+
+  /* === DARK MODE === */
+  :global(body.dark-mode) .popup-content {
+    background: #1f2937;
+  }
+
+  :global(body.dark-mode) .popup-header {
+    border-bottom-color: #374151;
+  }
+
+  :global(body.dark-mode) .popup-title {
+    color: #ffffff;
+  }
+
+  :global(body.dark-mode) .upload-area {
+    background: #111827;
+    border-color: #4b5563;
+  }
+
+  :global(body.dark-mode) .thumbnails-container {
+    background: #111827;
+  }
+
+  :global(body.dark-mode) .thumb-item {
+    background: #374151;
+    border-color: #4b5563;
+  }
+
+  :global(body.dark-mode) .add-more-btn {
+    background: #374151;
+    border-color: #4b5563;
+  }
+
+  :global(body.dark-mode) .convert-options {
+    background: #111827;
+  }
+
+  :global(body.dark-mode) .form-group label {
+    color: #e5e7eb;
+  }
+
+  :global(body.dark-mode) .form-group select,
+  :global(body.dark-mode) .form-group input {
+    background: #374151;
+    border-color: #4b5563;
+    color: #ffffff;
+  }
+
+  /* === RESPONSIVE === */
+  @media (max-width: 600px) {
+    .popup-content {
+      border-radius: 20px 20px 0 0;
+    }
+
+    .options-row {
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .action-buttons {
+      flex-direction: column;
+    }
+
+    .thumb-item,
+    .add-more-btn {
+      width: 70px;
+      height: 70px;
+    }
+  }
+</style>
+
+<script>
+  interface ImageData {
+    file: File;
+    url: string;
+    format: string;
+    width: number;
+    height: number;
+  }
+
+  function initImageEditor() {
+    const popup = document.getElementById('image-editor-popup');
+    const closeBtn = popup?.querySelector('.close-popup-btn');
+    const uploadArea = document.getElementById('upload-area');
+    const fileInput = document.getElementById('image-upload') as HTMLInputElement;
+    const thumbsContainer = document.getElementById('thumbnails-container');
+    const thumbsList = document.getElementById('thumbnails-list');
+    const formatSelect = document.getElementById('output-format') as HTMLSelectElement;
+    const resizeSelect = document.getElementById('resize-option') as HTMLSelectElement;
+    const customOptions = document.getElementById('custom-size-options');
+    const widthInput = document.getElementById('custom-width') as HTMLInputElement;
+    const heightInput = document.getElementById('custom-height') as HTMLInputElement;
+    const ratioCheckbox = document.getElementById('maintain-ratio') as HTMLInputElement;
+    const qualityGroup = document.getElementById('quality-group');
+    const qualitySlider = document.getElementById('image-quality') as HTMLInputElement;
+    const qualityValue = document.getElementById('quality-value');
+    const processBtn = document.getElementById('process-btn') as HTMLButtonElement;
+    const clearBtn = document.getElementById('clear-btn') as HTMLButtonElement;
+    const progressContainer = document.getElementById('progress-container');
+    const progressFill = document.getElementById('progress-fill');
+    const progressText = document.getElementById('progress-text');
+
+    let images: ImageData[] = [];
+
+    // Close popup
+    closeBtn?.addEventListener('click', () => {
+      popup?.classList.remove('active');
+    });
+
+    popup?.addEventListener('click', (e) => {
+      if (e.target === popup) popup?.classList.remove('active');
+    });
+
+    // Upload events
+    uploadArea?.addEventListener('click', () => fileInput?.click());
+    
+    uploadArea?.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadArea.classList.add('dragover');
+    });
+
+    uploadArea?.addEventListener('dragleave', () => {
+      uploadArea.classList.remove('dragover');
+    });
+
+    uploadArea?.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadArea.classList.remove('dragover');
+      if (e.dataTransfer?.files) handleFiles(e.dataTransfer.files);
+    });
+
+    fileInput?.addEventListener('change', (e) => {
+      const files = (e.target as HTMLInputElement).files;
+      if (files) handleFiles(files);
+      fileInput.value = '';
+    });
+
+    // Handle files
+    function handleFiles(files: FileList) {
+      const imageFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
+      let loaded = 0;
+
+      imageFiles.forEach(file => {
+        const url = URL.createObjectURL(file);
+        const format = file.type.split('/')[1];
+        const img = new Image();
+        
+        img.onload = () => {
+          images.push({
+            file,
+            url,
+            format,
+            width: img.naturalWidth,
+            height: img.naturalHeight
+          });
+          
+          loaded++;
+          if (loaded === imageFiles.length) {
+            render();
+          }
+        };
+        
+        img.src = url;
+      });
+    }
+
+    // Render thumbnails
+    function render() {
+      if (!uploadArea || !thumbsContainer || !thumbsList) return;
+
+      if (images.length > 0) {
+        uploadArea.style.display = 'none';
+        thumbsContainer.style.display = 'block';
+        processBtn.disabled = false;
+        clearBtn.disabled = false;
+      } else {
+        uploadArea.style.display = 'block';
+        thumbsContainer.style.display = 'none';
+        processBtn.disabled = true;
+        clearBtn.disabled = true;
+        return;
+      }
+
+      thumbsList.innerHTML = '';
+
+      images.forEach((img, i) => {
+        const div = document.createElement('div');
+        div.className = 'thumb-item';
+        div.innerHTML = `
+          <img src="${img.url}" alt="Image ${i + 1}">
+          <button class="thumb-remove" data-index="${i}">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        `;
+        thumbsList.appendChild(div);
+      });
+
+      const addBtn = document.createElement('button');
+      addBtn.className = 'add-more-btn';
+      addBtn.innerHTML = `
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+        </svg>
+      `;
+      addBtn.onclick = () => fileInput?.click();
+      thumbsList.appendChild(addBtn);
+
+      // Remove buttons
+      thumbsList.querySelectorAll('.thumb-remove').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const index = parseInt((btn as HTMLElement).dataset.index || '0');
+          URL.revokeObjectURL(images[index].url);
+          images.splice(index, 1);
+          render();
+        });
+      });
+    }
+
+    // Clear all
+    clearBtn?.addEventListener('click', () => {
+      images.forEach(img => URL.revokeObjectURL(img.url));
+      images = [];
+      render();
+    });
+
+    // Resize toggle
+    resizeSelect?.addEventListener('change', () => {
+      if (customOptions) {
+        customOptions.style.display = resizeSelect.value === 'custom' ? 'block' : 'none';
+      }
+    });
+
+    // Maintain ratio
+    widthInput?.addEventListener('input', () => {
+      if (ratioCheckbox?.checked && heightInput && images[0]) {
+        const w = parseFloat(widthInput.value);
+        if (!isNaN(w)) {
+          const ratio = images[0].width / images[0].height;
+          heightInput.value = Math.round(w / ratio).toString();
+        }
+      }
+    });
+
+    heightInput?.addEventListener('input', () => {
+      if (ratioCheckbox?.checked && widthInput && images[0]) {
+        const h = parseFloat(heightInput.value);
+        if (!isNaN(h)) {
+          const ratio = images[0].width / images[0].height;
+          widthInput.value = Math.round(h * ratio).toString();
+        }
+      }
+    });
+
+    // Quality
+    qualitySlider?.addEventListener('input', () => {
+      if (qualityValue) qualityValue.textContent = `${qualitySlider.value}%`;
+    });
+
+    formatSelect?.addEventListener('change', () => {
+      const fmt = formatSelect.value;
+      if (qualityGroup) {
+        qualityGroup.style.display = ['jpg', 'jpeg', 'webp'].includes(fmt) ? 'block' : 'none';
+      }
+    });
+
+    // Process
+    processBtn?.addEventListener('click', async () => {
+      const format = formatSelect.value;
+      const resize = resizeSelect.value === 'custom';
+      const w = resize ? parseInt(widthInput.value) || null : null;
+      const h = resize ? parseInt(heightInput.value) || null : null;
+      const quality = ['jpg', 'jpeg', 'webp'].includes(format) ? parseInt(qualitySlider.value) / 100 : 1;
+
+      if (progressContainer) progressContainer.style.display = 'block';
+      processBtn.disabled = true;
+
+      for (let i = 0; i < images.length; i++) {
+        const progress = ((i + 1) / images.length) * 100;
+        if (progressFill) progressFill.style.width = `${progress}%`;
+        if (progressText) progressText.textContent = `Đang xử lý: ${i + 1}/${images.length}`;
+
+        await processImage(images[i], format, w, h, quality);
+      }
+
+      if (progressContainer) progressContainer.style.display = 'none';
+      processBtn.disabled = false;
+      alert('Xử lý hoàn tất!');
+    });
+
+    // Process single image
+    function processImage(
+      img: ImageData,
+      format: string,
+      width: number | null,
+      height: number | null,
+      quality: number
+    ): Promise<void> {
+      return new Promise((resolve) => {
+        const image = new Image();
+        image.onload = () => {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d')!;
+
+          let outW = width || image.width;
+          let outH = height || image.height;
+
+          if (width && !height) {
+            outH = Math.round((image.height / image.width) * width);
+          } else if (height && !width) {
+            outW = Math.round((image.width / image.height) * height);
+          }
+
+          canvas.width = outW;
+          canvas.height = outH;
+
+          // Letterboxing - không méo
+          const scale = Math.min(outW / image.width, outH / image.height);
+          const w = image.width * scale;
+          const h = image.height * scale;
+          const x = (outW - w) / 2;
+          const y = (outH - h) / 2;
+
+          const fmt = format === 'original' ? img.format : format;
+          if (['jpg', 'jpeg'].includes(fmt)) {
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, outW, outH);
+          }
+
+          ctx.drawImage(image, x, y, w, h);
+
+          let finalFmt = fmt === 'jpg' ? 'jpeg' : fmt;
+          const mime = `image/${finalFmt}`;
+
+          canvas.toBlob((blob) => {
+            if (blob) {
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              const name = img.file.name.replace(/\.[^.]+$/, '');
+              a.download = `${name}.${finalFmt}`;
+              a.href = url;
+              a.click();
+              URL.revokeObjectURL(url);
+            }
+            resolve();
+          }, mime, quality);
+        };
+        image.src = img.url;
+      });
+    }
+
+    // Listen for open
+    document.addEventListener('openToolPopup', (e: Event) => {
+      const evt = e as CustomEvent;
+      if (evt.detail.toolId === 'image-editor') {
+        popup?.classList.add('active');
+      }
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initImageEditor);
+  } else {
+    initImageEditor();
+  }
+</script>

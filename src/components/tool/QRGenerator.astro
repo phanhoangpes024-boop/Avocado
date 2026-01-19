@@ -1,0 +1,862 @@
+---
+// Popup tạo mã QR
+---
+
+<div class="tool-popup" id="qr-generator-popup">
+  <div class="popup-content">
+    <!-- Header -->
+    <div class="popup-header">
+      <h2 class="popup-title">🎯 Tạo mã QR</h2>
+      <button class="close-popup-btn" data-popup="qr-generator">
+        <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="popup-body">
+      <!-- Input: Link hoặc văn bản -->
+      <div class="form-group">
+        <label for="qr-text">Nhập link hoặc văn bản:</label>
+        <input type="text" id="qr-text" placeholder="https://example.com hoặc văn bản bất kỳ..." />
+      </div>
+
+      <!-- QR Options Row -->
+      <div class="options-row">
+        <!-- Logo Upload -->
+        <div class="form-group half">
+          <label for="qr-logo">Logo (tùy chọn):</label>
+          
+          <!-- Button upload - ẩn khi đã có ảnh -->
+          <button type="button" class="logo-upload-btn" id="logo-upload-btn">
+            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+            <span id="logo-btn-text">Chọn logo</span>
+          </button>
+          <input type="file" id="qr-logo" accept="image/*" style="display: none;" />
+          
+          <!-- Logo Thumbnail - hiện khi đã có ảnh, thay thế button -->
+          <div class="logo-thumbnail" id="logo-thumbnail" style="display: none;">
+            <img id="logo-preview" alt="Logo preview" />
+            <button type="button" class="remove-logo-btn" id="remove-logo-btn">
+              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Logo Size -->
+        <div class="form-group half">
+          <label for="qr-logo-size">Kích thước logo:</label>
+          <div class="slider-group">
+            <input type="range" id="qr-logo-size" min="20" max="100" value="50" />
+            <span class="slider-value" id="qr-logo-size-value">50px</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Color Options -->
+      <div class="options-row">
+        <div class="form-group half">
+          <label for="qr-fg-color">Màu QR:</label>
+          <div class="color-picker">
+            <input type="color" id="qr-fg-color" value="#000000" />
+            <span id="qr-fg-color-value">#000000</span>
+          </div>
+        </div>
+
+        <div class="form-group half">
+          <label for="qr-bg-color">Màu nền:</label>
+          <div class="color-picker">
+            <input type="color" id="qr-bg-color" value="#ffffff" />
+            <span id="qr-bg-color-value">#ffffff</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Preview QR Code -->
+      <div class="qr-preview">
+        <div class="preview-label">Preview:</div>
+        <canvas id="qr-canvas"></canvas>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="action-buttons">
+        <button class="btn btn-primary" id="generate-qr-btn">
+          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+          </svg>
+          <span>Tạo mã QR</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== QR RESULT POPUP ========== -->
+<div class="tool-popup" id="qr-result-popup">
+  <div class="popup-content result-popup">
+    <!-- Header -->
+    <div class="popup-header">
+      <h2 class="popup-title">✅ Mã QR của bạn</h2>
+      <button class="close-popup-btn" data-popup="qr-result">
+        <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="popup-body">
+      <div class="result-qr-container">
+        <canvas id="result-qr-canvas"></canvas>
+      </div>
+
+      <button class="btn btn-success btn-large" id="download-result-btn">
+        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+        </svg>
+        <span>Tải xuống mã QR</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* === POPUP OVERLAY === */
+  .tool-popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 20px;
+    animation: fadeIn 0.2s ease;
+  }
+
+  .tool-popup.active {
+    display: flex;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  /* === POPUP CONTENT === */
+  .popup-content {
+    background: white;
+    border-radius: 24px;
+    width: 100%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.3s ease;
+  }
+
+  @keyframes slideUp {
+    from { 
+      opacity: 0;
+      transform: translateY(30px) scale(0.95);
+    }
+    to { 
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  /* === HEADER === */
+  .popup-header {
+    padding: 24px;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .popup-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0;
+  }
+
+  .close-popup-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #f3f4f6;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .close-popup-btn:hover {
+    background: #e5e7eb;
+    transform: rotate(90deg);
+  }
+
+  /* === BODY === */
+  .popup-body {
+    padding: 24px;
+    overflow-y: auto;
+    flex: 1;
+  }
+
+  /* === FORM GROUPS === */
+  .form-group {
+    margin-bottom: 10px;
+  }
+
+  .form-group.half {
+    flex: 1;
+  }
+
+  .form-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 4px;
+  }
+
+  .form-group textarea {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 14px;
+    font-family: inherit;
+    resize: vertical;
+    transition: border-color 0.2s;
+  }
+
+  .form-group textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+  }
+
+  .form-group input[type="text"] {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 14px;
+    font-family: inherit;
+    transition: border-color 0.2s;
+  }
+
+  .form-group input[type="text"]:focus {
+    outline: none;
+    border-color: #3b82f6;
+  }
+
+  /* === OPTIONS ROW === */
+  .options-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 10px;
+  }
+
+  /* === FILE INPUT === */
+  .logo-upload-btn {
+    width: 100px;
+    height: 100px;
+    padding: 12px;
+    background: #f3f4f6;
+    border: 2px dashed #d1d5db;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 12px;
+    font-weight: 500;
+    color: #6b7280;
+  }
+
+  .logo-upload-btn:hover {
+    background: #e5e7eb;
+    border-color: #9ca3af;
+  }
+
+  .logo-upload-btn svg {
+    flex-shrink: 0;
+  }
+
+  .logo-upload-btn span {
+    text-align: center;
+    line-height: 1.3;
+  }
+
+  /* Logo Thumbnail - thay thế button khi có ảnh */
+  .logo-thumbnail {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 2px solid #e5e7eb;
+    background: #f9fafb;
+  }
+
+  .logo-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 8px;
+  }
+
+  .remove-logo-btn {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.7);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .remove-logo-btn:hover {
+    background: rgba(239, 68, 68, 0.9);
+    transform: scale(1.1);
+  }
+
+  .remove-logo-btn svg {
+    stroke: white;
+  }
+
+  /* === SLIDER === */
+  .slider-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .slider-group input[type="range"] {
+    flex: 1;
+    height: 6px;
+    border-radius: 3px;
+    background: #e5e7eb;
+    outline: none;
+    -webkit-appearance: none;
+  }
+
+  .slider-group input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #3b82f6;
+    cursor: pointer;
+  }
+
+  .slider-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1f2937;
+    min-width: 50px;
+    text-align: right;
+  }
+
+  /* === COLOR PICKER === */
+  .color-picker {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .color-picker input[type="color"] {
+    width: 60px;
+    height: 40px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  .color-picker span {
+    font-size: 14px;
+    font-weight: 500;
+    color: #6b7280;
+    font-family: monospace;
+  }
+
+  /* === QR PREVIEW === */
+  .qr-preview {
+    margin: 12px 0;
+    padding: 12px;
+    background: #f9fafb;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 140px;
+  }
+
+  .preview-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .qr-preview canvas {
+    max-width: 240px;
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  /* === ACTION BUTTONS === */
+  .action-buttons {
+    display: flex;
+    gap: 12px;
+  }
+
+  .btn {
+    flex: 1;
+    padding: 14px 24px;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s;
+  }
+
+  .btn-primary {
+    background: #3b82f6;
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background: #2563eb;
+    transform: translateY(-2px);
+  }
+
+  .btn-success {
+    background: #10b981;
+    color: white;
+  }
+
+  .btn-success:hover {
+    background: #059669;
+    transform: translateY(-2px);
+  }
+
+  .btn:active {
+    transform: translateY(0);
+  }
+
+  /* === RESULT POPUP === */
+  .result-qr-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+    background: #f9fafb;
+    border-radius: 16px;
+    margin-bottom: 20px;
+  }
+
+  .result-qr-container canvas {
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 300px;
+    height: auto;
+  }
+
+  .btn-large {
+    width: 100%;
+    padding: 16px 32px;
+    font-size: 16px;
+  }
+
+  /* === DARK MODE === */
+  :global(body.dark-mode) .popup-content {
+    background: #1f2937;
+  }
+
+  :global(body.dark-mode) .popup-header {
+    border-bottom-color: #374151;
+  }
+
+  :global(body.dark-mode) .popup-title {
+    color: #ffffff;
+  }
+
+  :global(body.dark-mode) .close-popup-btn {
+    background: #374151;
+  }
+
+  :global(body.dark-mode) .close-popup-btn:hover {
+    background: #4b5563;
+  }
+
+  :global(body.dark-mode) .form-group label {
+    color: #e5e7eb;
+  }
+
+  :global(body.dark-mode) .form-group textarea {
+    background: #374151;
+    border-color: #4b5563;
+    color: #ffffff;
+  }
+
+  :global(body.dark-mode) .logo-upload-btn {
+    background: #374151;
+    border-color: #4b5563;
+    color: #9ca3af;
+  }
+
+  :global(body.dark-mode) .logo-upload-btn:hover {
+    background: #4b5563;
+  }
+
+  :global(body.dark-mode) .logo-thumbnail {
+    background: #111827;
+    border-color: #374151;
+  }
+
+  :global(body.dark-mode) .qr-preview {
+    background: #111827;
+  }
+
+  :global(body.dark-mode) .result-qr-container {
+    background: #111827;
+  }
+
+  :global(body.dark-mode) .form-group input[type="text"] {
+    background: #374151;
+    border-color: #4b5563;
+    color: #ffffff;
+  }
+
+  /* === RESPONSIVE === */
+  @media (max-width: 600px) {
+    .popup-content {
+      max-width: 100%;
+      max-height: 95vh;
+      border-radius: 20px 20px 0 0;
+    }
+
+    .popup-header {
+      padding: 20px 16px;
+    }
+
+    .popup-title {
+      font-size: 20px;
+    }
+
+    .popup-body {
+      padding: 16px;
+    }
+
+    .options-row {
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .form-group.half {
+      width: 100%;
+    }
+
+    .action-buttons {
+      flex-direction: column;
+    }
+
+    .btn {
+      padding: 12px 20px;
+      font-size: 14px;
+    }
+
+    .qr-preview {
+      padding: 10px;
+      min-height: 110px;
+    }
+
+    .qr-preview canvas {
+      max-width: 200px;
+    }
+
+    .result-qr-container {
+      padding: 24px;
+    }
+
+    .result-qr-container canvas {
+      width: 260px;
+    }
+
+    .btn-large {
+      padding: 14px 24px;
+      font-size: 15px;
+    }
+
+    .logo-upload-btn,
+    .logo-thumbnail {
+      width: 80px;
+      height: 80px;
+    }
+  }
+
+  @media (min-width: 601px) and (max-width: 900px) {
+    .popup-content {
+      max-width: 90%;
+    }
+
+    .qr-preview canvas {
+      max-width: 220px;
+    }
+
+    .result-qr-container canvas {
+      width: 280px;
+    }
+  }
+</style>
+
+<script>
+  // Import thư viện QRCode.js
+  import QRCode from 'qrcode';
+
+  function initQRGenerator() {
+    const popup = document.getElementById('qr-generator-popup');
+    const resultPopup = document.getElementById('qr-result-popup');
+    const closeBtn = popup?.querySelector('.close-popup-btn');
+    const closeResultBtn = resultPopup?.querySelector('.close-popup-btn');
+    
+    const textInput = document.getElementById('qr-text') as HTMLInputElement;
+    const logoUploadBtn = document.getElementById('logo-upload-btn');
+    const logoInput = document.getElementById('qr-logo') as HTMLInputElement;
+    const logoThumbnail = document.getElementById('logo-thumbnail');
+    const logoPreview = document.getElementById('logo-preview') as HTMLImageElement;
+    const removeLogoBtn = document.getElementById('remove-logo-btn');
+    
+    const logoSizeInput = document.getElementById('qr-logo-size') as HTMLInputElement;
+    const logoSizeValue = document.getElementById('qr-logo-size-value');
+    const fgColorInput = document.getElementById('qr-fg-color') as HTMLInputElement;
+    const bgColorInput = document.getElementById('qr-bg-color') as HTMLInputElement;
+    const fgColorValue = document.getElementById('qr-fg-color-value');
+    const bgColorValue = document.getElementById('qr-bg-color-value');
+    
+    const canvas = document.getElementById('qr-canvas') as HTMLCanvasElement;
+    const resultCanvas = document.getElementById('result-qr-canvas') as HTMLCanvasElement;
+    const generateBtn = document.getElementById('generate-qr-btn');
+    const downloadBtn = document.getElementById('download-result-btn');
+
+    let logoImage: HTMLImageElement | null = null;
+    let finalQRDataURL: string = '';
+
+    // Tạo QR demo mặc định
+    function generateDemoQR() {
+      const text = textInput?.value.trim() || 'https://example.com';
+      
+      QRCode.toCanvas(canvas, text, {
+        width: 240,
+        margin: 2,
+        color: {
+          dark: fgColorInput?.value || '#000000',
+          light: bgColorInput?.value || '#ffffff',
+        },
+      }).then(() => {
+        if (logoImage) {
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            const logoSize = parseInt(logoSizeInput?.value || '50');
+            const x = (canvas.width - logoSize) / 2;
+            const y = (canvas.height - logoSize) / 2;
+
+            ctx.fillStyle = bgColorInput?.value || '#ffffff';
+            ctx.fillRect(x - 5, y - 5, logoSize + 10, logoSize + 10);
+            ctx.drawImage(logoImage, x, y, logoSize, logoSize);
+          }
+        }
+      });
+    }
+
+    // Đóng popup chính
+    closeBtn?.addEventListener('click', () => {
+      popup?.classList.remove('active');
+    });
+
+    // Đóng popup kết quả
+    closeResultBtn?.addEventListener('click', () => {
+      resultPopup?.classList.remove('active');
+    });
+
+    popup?.addEventListener('click', (e) => {
+      if (e.target === popup) popup.classList.remove('active');
+    });
+
+    resultPopup?.addEventListener('click', (e) => {
+      if (e.target === resultPopup) resultPopup.classList.remove('active');
+    });
+
+    // Upload logo
+    logoUploadBtn?.addEventListener('click', () => {
+      logoInput?.click();
+    });
+
+    logoInput?.addEventListener('change', (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          logoImage = new Image();
+          logoImage.onload = () => {
+            if (logoPreview && logoThumbnail && logoUploadBtn) {
+              logoPreview.src = logoImage!.src;
+              logoThumbnail.style.display = 'block';
+              logoUploadBtn.style.display = 'none';
+              generateDemoQR();
+            }
+          };
+          logoImage.src = event.target?.result as string;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Remove logo
+    removeLogoBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      logoImage = null;
+      if (logoThumbnail && logoUploadBtn && logoInput) {
+        logoThumbnail.style.display = 'none';
+        logoUploadBtn.style.display = 'flex';
+        logoInput.value = '';
+        generateDemoQR();
+      }
+    });
+
+    // Update sliders và colors
+    logoSizeInput?.addEventListener('input', () => {
+      if (logoSizeValue) {
+        logoSizeValue.textContent = `${logoSizeInput.value}px`;
+        generateDemoQR();
+      }
+    });
+
+    fgColorInput?.addEventListener('input', () => {
+      if (fgColorValue) {
+        fgColorValue.textContent = fgColorInput.value;
+        generateDemoQR();
+      }
+    });
+
+    bgColorInput?.addEventListener('input', () => {
+      if (bgColorValue) {
+        bgColorValue.textContent = bgColorInput.value;
+        generateDemoQR();
+      }
+    });
+
+    // Update demo khi nhập text
+    textInput?.addEventListener('input', () => {
+      generateDemoQR();
+    });
+
+    // Tạo QR cuối cùng
+    generateBtn?.addEventListener('click', async () => {
+      const text = textInput?.value.trim();
+      
+      if (!text) {
+        alert('Vui lòng nhập link hoặc văn bản!');
+        return;
+      }
+
+      try {
+        await QRCode.toCanvas(resultCanvas, text, {
+          width: 320,
+          margin: 2,
+          color: {
+            dark: fgColorInput?.value || '#000000',
+            light: bgColorInput?.value || '#ffffff',
+          },
+        });
+
+        if (logoImage) {
+          const ctx = resultCanvas.getContext('2d');
+          if (ctx) {
+            const logoSize = parseInt(logoSizeInput?.value || '50');
+            const scale = 320 / 240;
+            const scaledLogoSize = logoSize * scale;
+            const x = (resultCanvas.width - scaledLogoSize) / 2;
+            const y = (resultCanvas.height - scaledLogoSize) / 2;
+
+            ctx.fillStyle = bgColorInput?.value || '#ffffff';
+            ctx.fillRect(x - 5, y - 5, scaledLogoSize + 10, scaledLogoSize + 10);
+            ctx.drawImage(logoImage, x, y, scaledLogoSize, scaledLogoSize);
+          }
+        }
+
+        finalQRDataURL = resultCanvas.toDataURL('image/png');
+        popup?.classList.remove('active');
+        resultPopup?.classList.add('active');
+
+      } catch (error) {
+        console.error('Lỗi tạo QR code:', error);
+        alert('Có lỗi xảy ra khi tạo mã QR!');
+      }
+    });
+
+    // Download QR
+    downloadBtn?.addEventListener('click', () => {
+      if (finalQRDataURL) {
+        const link = document.createElement('a');
+        link.download = 'qr-code.png';
+        link.href = finalQRDataURL;
+        link.click();
+      }
+    });
+
+    // Listen for open event
+    document.addEventListener('openToolPopup', (e: Event) => {
+      const customEvent = e as CustomEvent;
+      if (customEvent.detail.toolId === 'qr-generator') {
+        popup?.classList.add('active');
+        generateDemoQR();
+      }
+    });
+
+    // Tạo QR demo ban đầu
+    generateDemoQR();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initQRGenerator);
+  } else {
+    initQRGenerator();
+  }
+</script>

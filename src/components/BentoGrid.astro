@@ -9,7 +9,7 @@ import CardDarkMode from "./CardDarkMode.astro";
 import CardTech from "./CardTech.astro";
 import CardLife from "./CardLife.astro";
 import CardTool from "./CardTool.astro";
-import CardMock from "./CardMock.astro";
+import CardMiniTool from "./CardMiniTool.astro";
 
 
 
@@ -33,7 +33,7 @@ const { cols, cellSize, gap } = gridConfig;
       {item.type === "tech" && <CardTech title={item.title} techs={item.techs} />}
       {item.type === "life" && <CardLife feedUrl={item.feedUrl} />}
       {item.type === "tool" && <CardTool lottieFile={item.lottieFile} buttonText={item.buttonText} toolLink={item.toolLink} />}
-      {item.type === "mock" && <CardMock title={item.title} emoji={item.emoji} description={item.description} />}
+      {item.type === "minitool" && <CardMiniTool id={item.id} name={item.name} lottieFile={item.lottieFile} />}
     </div>
   ))}
 </div>

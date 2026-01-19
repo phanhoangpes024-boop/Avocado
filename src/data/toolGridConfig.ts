@@ -2,26 +2,24 @@
 
 export const toolGridItems: GridItem[] = [
   {
-    id: "mock1",
-    type: "mock",
+    id: "qr-generator",
+    type: "minitool",
     col: 1,
     row: 1,
     colSpan: 1,
     rowSpan: 1,
-    title: "Tool 1",
-    emoji: "🛠️",
-    description: "Công cụ số 1"
+    name: "Tạo QR",
+    lottieFile: "/qr.lottie"
   },
   {
-    id: "mock2",
-    type: "mock",
+    id: "image-editor",
+    type: "minitool",
     col: 2,
     row: 1,
     colSpan: 1,
     rowSpan: 1,
-    title: "Tool 2",
-    emoji: "⚡",
-    description: "Công cụ số 2"
+    name: "Chỉnh ảnh",
+    lottieFile: "/img.lottie"
   }
 ];
 

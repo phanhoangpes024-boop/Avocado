@@ -2,6 +2,8 @@
 import Layout from "../layouts/Layout.astro";
 import BentoGrid from "../components/BentoGrid.astro";
 import { toolGridItems } from "../data/toolGridConfig";
+import QRGenerator from "../components/tool/QRGenerator.astro";
+import ImageEditor from "../components/tool/ImageEditor.astro";
 ---
 
 <Layout title="Tools - Hector's Lab">
@@ -21,6 +23,8 @@ import { toolGridItems } from "../data/toolGridConfig";
 
     <div class="transition-overlay" id="transition-overlay"></div>
   </div>
+  <QRGenerator />
+  <ImageEditor />
 </Layout>
 
 <style>
