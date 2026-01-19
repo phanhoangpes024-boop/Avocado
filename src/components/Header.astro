@@ -112,22 +112,93 @@ const { logo, nav } = Astro.props;
 </style>
 
 <script>
-  const logoImg = document.getElementById("logo-img") as HTMLImageElement;
-  let isDark = localStorage.getItem("darkMode") === "true";
+  // THAY THẾ TOÀN BỘ PHẦN <script> TRONG Header.astro
 
-  function updateLogo() {
-    if (logoImg) {
-      logoImg.src = isDark ? "/logodark.webp" : "/logolight.webp";
-    }
+const logoImg = document.getElementById("logo-img") as HTMLImageElement;
+let isDark = localStorage.getItem("darkMode") === "true";
+
+function updateLogo() {
+  if (logoImg) {
+    logoImg.src = isDark ? "/logodark.webp" : "/logolight.webp";
   }
+}
 
+updateLogo();
+
+// Lắng nghe sự kiện darkmode toggle
+const observer = new MutationObserver(() => {
+  isDark = document.body.classList.contains("dark-mode");
   updateLogo();
+});
 
-  // Lắng nghe sự kiện darkmode toggle
-  const observer = new MutationObserver(() => {
-    isDark = document.body.classList.contains("dark-mode");
-    updateLogo();
+observer.observe(document.body, { attributes: true, attributeFilter: ["class"] });
+
+// ===== ABOUT MODE FUNCTIONALITY =====
+function initAboutMode() {
+  const aboutLink = document.querySelector('a[href="#about"]');
+  
+  if (!aboutLink) {
+    console.log('About link not found');
+    return;
+  }
+  
+  // Tạo overlay và nút đóng
+  const overlay = document.createElement('div');
+  overlay.className = 'about-overlay';
+  overlay.id = 'about-overlay';
+  document.body.appendChild(overlay);
+  
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'close-about-btn';
+  closeBtn.setAttribute('aria-label', 'Đóng');
+  closeBtn.innerHTML = `
+    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+    </svg>
+  `;
+  document.body.appendChild(closeBtn);
+  
+  // Đánh dấu 3 card đặc biệt
+  const featuredCards = ['intro', 'map', 'twitter'];
+  featuredCards.forEach(id => {
+    const card = document.querySelector(`[data-id="${id}"]`);
+    if (card) {
+      card.classList.add('about-featured');
+    }
   });
+  
+  // Click About
+  aboutLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    console.log('About clicked');
+    document.body.classList.add('about-mode');
+    overlay.classList.add('active');
+  });
+  
+  // Đóng About
+  function closeAbout() {
+    console.log('Closing about');
+    document.body.classList.remove('about-mode');
+    overlay.classList.remove('active');
+  }
+  
+  closeBtn.addEventListener('click', closeAbout);
+  overlay.addEventListener('click', closeAbout);
+  
+  // ESC để đóng
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && document.body.classList.contains('about-mode')) {
+      closeAbout();
+    }
+  });
+  
+  console.log('About mode initialized');
+}
 
-  observer.observe(document.body, { attributes: true, attributeFilter: ["class"] });
+// Chạy khi DOM sẵn sàng
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initAboutMode);
+} else {
+  initAboutMode();
+}
 </script>
