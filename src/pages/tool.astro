@@ -7,7 +7,7 @@ import ImageEditor from "../components/tool/ImageEditor.astro";
 ---
 
 <Layout title="Tools - Hector's Lab">
-  <div class="tool-wrapper" id="tool-wrapper">
+  <div class="portfolio-wrapper">
     <button class="close-btn" id="close-btn" aria-label="Quay về">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -15,7 +15,7 @@ import ImageEditor from "../components/tool/ImageEditor.astro";
       </svg>
     </button>
 
-    <div class="tool-container" id="tool-container">
+    <div class="portfolio-container">
       <h1 class="tool-title">Hector's Lab</h1>
       <p class="tool-subtitle">Công cụ phát triển</p>
       <BentoGrid items={toolGridItems} />
@@ -28,13 +28,50 @@ import ImageEditor from "../components/tool/ImageEditor.astro";
 </Layout>
 
 <style>
-  .tool-wrapper {
+  /* Wrapper giống trang chủ */
+  .portfolio-wrapper {
     width: 100%;
     min-height: 100vh;
-    padding: 24px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    padding: 24px 8px;
     position: relative;
   }
 
+  /* Ẩn scrollbar */
+  .portfolio-wrapper::-webkit-scrollbar {
+    display: none;
+  }
+
+  .portfolio-wrapper {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* Container giống trang chủ */
+  .portfolio-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 60px 16px 0;
+  }
+
+  @media (max-width: 900px) {
+    .portfolio-container {
+      padding: 60px 8px 0;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .portfolio-container {
+      padding: 60px 4px 0;
+    }
+    
+    .portfolio-wrapper {
+      padding: 24px 4px;
+    }
+  }
+
+  /* Close button */
   .close-btn {
     position: fixed;
     top: 24px;
@@ -63,12 +100,7 @@ import ImageEditor from "../components/tool/ImageEditor.astro";
     stroke: white;
   }
 
-  .tool-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 60px 16px 0;
-  }
-
+  /* Title */
   .tool-title {
     font-size: 42px;
     font-weight: 800;
@@ -84,6 +116,7 @@ import ImageEditor from "../components/tool/ImageEditor.astro";
     margin: 0 0 48px 0;
   }
 
+  /* Transition overlay */
   .transition-overlay {
     position: fixed;
     top: 0;
@@ -102,6 +135,7 @@ import ImageEditor from "../components/tool/ImageEditor.astro";
     pointer-events: all;
   }
 
+  /* Dark mode */
   :global(body.dark-mode) .close-btn {
     background: #1a1a1a;
     border-color: #333333;
@@ -111,12 +145,29 @@ import ImageEditor from "../components/tool/ImageEditor.astro";
     color: #ffffff;
   }
 
+  :global(body.dark-mode) .tool-subtitle {
+    color: #9ca3af;
+  }
+
+  /* Responsive */
   @media (max-width: 600px) {
     .tool-title {
       font-size: 28px;
     }
+
+    .tool-subtitle {
+      font-size: 16px;
+    }
+
+    .close-btn {
+      width: 40px;
+      height: 40px;
+      top: 16px;
+      right: 16px;
+    }
   }
 
+  /* Fade out animation */
   .fade-out {
     animation: fadeOut 0.5s ease forwards;
   }
@@ -131,7 +182,7 @@ import ImageEditor from "../components/tool/ImageEditor.astro";
 
 <script>
   const closeBtn = document.getElementById('close-btn');
-  const toolContainer = document.getElementById('tool-container');
+  const toolContainer = document.querySelector('.portfolio-container') as HTMLElement;
   const overlay = document.getElementById('transition-overlay');
 
   closeBtn?.addEventListener('click', () => {
